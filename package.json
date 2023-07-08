@@ -1,0 +1,13 @@
+{
+  "name": "decklist",
+  "version": "0.0.1",
+  "license": "Unlicense",
+  "scripts": {
+    "test": "npm run test --workspaces",
+    "publish": "npm run publish --workspaces"
+  },
+  "workspaces": [
+    "api",
+    "backend/admin"
+  ]
+}
