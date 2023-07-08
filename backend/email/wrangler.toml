@@ -1,6 +1,5 @@
-name = "admin"
+name = "email"
 main = "src/worker.ts"
-node_compat = true
 compatibility_date = "2023-06-28"
 
 kv_namespaces = [
@@ -8,5 +7,5 @@ kv_namespaces = [
 ]
 
 r2_buckets = [
-    { binding = 'content', bucket_name = 'emails-content' } 
+    { binding = "content", bucket_name = "emails-content" } 
 ]

@@ -3,12 +3,12 @@
   "version": "0.0.1",
   "license": "Unlicense",
   "scripts": {
-    "test": "npm run test --workspaces",
-    "publish": "npm run publish --workspaces"
+    "test": "npm run test --workspaces"
   },
   "workspaces": [
     "api",
     "backend/admin",
+    "backend/email",
     "frontend"
   ]
 }
