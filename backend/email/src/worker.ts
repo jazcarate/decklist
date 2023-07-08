@@ -6,8 +6,8 @@ interface Env {
 	content: R2Bucket
 }
 
-async function readAll(stream: ReadableStream, size: number): Promise<Buffer> {
-	let result = Buffer.allocUnsafe(size);
+async function readAll(stream: ReadableStream, size: number): Promise<Uint8Array> {
+	let result = new Uint8Array(size);
 	let bytesRead = 0;
 	const reader = stream.getReader();
 	while (true) {
@@ -15,7 +15,7 @@ async function readAll(stream: ReadableStream, size: number): Promise<Buffer> {
 		if (done) {
 			break;
 		}
-		result.write(value, bytesRead);
+		result.set(value, bytesRead);
 		bytesRead += value.length;
 	}
 	return result;
@@ -28,9 +28,10 @@ function slugFrom(adress: string): string {
 export default {
 	async email(message: ForwardableEmailMessage, env: Env, ctx: ExecutionContext): Promise<void> {
 		const slug = slugFrom(message.to)
-		const event = await env.db.get(`event:${slug}`);
+		const event = await env.db.get(`events:${slug}`);
 		if (!event) {
 			console.log(`Discarding email from '${message.from}'. No event '${slug}'`);
+			message.setReject(`There is no '${slug}' event`);
 			return;
 		}
 
@@ -45,16 +46,24 @@ export default {
 		const id = crypto.randomUUID();
 
 		const key = `event:${slug}:entry:${id}`;
-		await env.db.put(key, entry);
+		await env.db.put(key, JSON.stringify(entry));
 		console.log(`Saved entry '${key}'`);
 
 		const bodyKey = `attachment:${id}:0`;
-		await env.content.put(bodyKey, `${email.subject}\n\n${email.text}`);
+		await env.content.put(bodyKey, `${email.subject}\n\n${email.text}`, {
+			httpMetadata: {
+				contentType: "text/plain", contentDisposition: `attachment; filename="body.txt"`
+			}
+		});
 		console.log(`Saved body attachment '${bodyKey}'`);
 
 		await Promise.all(email.attachments.map(async (attachment, idx) => {
 			const attachmentKey = `attachment:${id}:${idx + 1}`;
-			const obj = await env.content.put(attachmentKey, attachment.content);
+			const obj = await env.content.put(attachmentKey, attachment.content, {
+				httpMetadata: {
+					contentType: attachment.mimeType, contentDisposition: `attachment; filename="${attachment.filename}"`
+				}
+			});
 			console.log(`Saved attachment '${attachmentKey}' ${obj.size}bytes`);
 		}));
 	},
