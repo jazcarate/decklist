@@ -16,3 +16,9 @@ token:[uuid]:event:[slug] -> {}
 
 R2:
 attachment:[entry_uuid]:[#] -> {r2_link}
+
+## Frontend development
+
+```bash
+wrangler pages dev --kv=db --r2=content -- npm run dev -w frontend
+```
