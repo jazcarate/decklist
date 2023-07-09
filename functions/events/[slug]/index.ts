@@ -1,4 +1,5 @@
 import { Entry, Event } from "../../../api";
+import { getToken, getUserUnsafe } from "../../auth";
 
 interface Env {
     db: KVNamespace
@@ -33,8 +34,17 @@ async function pbkdf2(password: string, iterations = 1e5): Promise<string> {
     return compositeBase64;
 }
 
-export const onRequestGet: PagesFunction<Env> = async ({ env, params }) => {
+export const onRequestGet: PagesFunction<Env> = async ({ request, env, params }) => {
     const slug = params.slug as string;
+
+    if (!slug)
+        return new Response("Missing event slug", { status: 400, statusText: "Bad Request" });
+
+    const token = await getToken(request);
+    const authorized = await env.db.get(`token:${token}:event:${slug}`);
+    if (!authorized) {
+        return new Response("Forbidden", { status: 403, statusText: "Forbidden" });
+    }
 
     const event = await env.db.getWithMetadata<Metadata>(`events:${slug}`);
     const prefix = `event:${slug}:entry:`;
@@ -53,7 +63,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, params, request, 
     const json = await request.json<any>();
     const password = json.password as string;
     const name = json.name as string;
-    const date = json.name as number;
+    const date = json.date as number;
     const slug = params.slug as string;
 
     if (!slug)
@@ -72,7 +82,12 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, params, request, 
         passwordHash,
         date
     };
-    waitUntil(env.db.put(`events:${slug}`, JSON.stringify(event), { metadata: { name } }));
+
+    const token = await getToken(request);
+    waitUntil(Promise.all([
+        env.db.put(`events:${slug}`, JSON.stringify(event), { metadata: { name } }),
+        env.db.put(`token:${token}:event:${slug}`, new Date().toISOString()),
+    ]));
 
     return new Response(`Created ${slug}`, { status: 201, statusText: "Created" });
 }

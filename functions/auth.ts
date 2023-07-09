@@ -20,3 +20,11 @@ export async function getUser(request: Request, db: KVNamespace): Promise<User |
 
     return { ...JSON.parse(user), token };
 }
+
+export async function getToken(request: Request): Promise<string | null> {
+    const auth = request.headers.get("Authorization") ?? '';
+    if (!auth.startsWith(AUTH_PREFIX))
+        return null;
+
+    return auth.substring(AUTH_PREFIX.length);
+}
