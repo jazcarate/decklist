@@ -30,7 +30,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/e" element={<CreateEvent />} />
-          <Route path="/e/:id" element={<Event />} />
+          <Route path="/e/:slug" element={<Event />} />
         </Routes>
       </Router>
     </Layout >
