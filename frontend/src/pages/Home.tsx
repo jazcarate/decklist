@@ -14,7 +14,7 @@ function Home() {
                 You can also share the email inbox with other judges.
             </Paragraph>
 
-            <Link to="/events">
+            <Link to="/e">
                 <Button type="primary">Create event</Button>
             </Link>
         </Typography>

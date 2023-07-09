@@ -6,8 +6,8 @@ import ShareEmail from "./ShareEmail";
 import GoToEvent from "./GoToEvent";
 
 function CreateEvent() {
-    const [current, setCurrent] = useState(2);
-    const [slug, setSlug] = useState("asd");
+    const [current, setCurrent] = useState(0);
+    const [slug, setSlug] = useState("");
 
     const created = (slug: string) => {
         setSlug(slug);
