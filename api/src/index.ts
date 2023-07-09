@@ -1,5 +1,5 @@
 export interface Event {
-    creationDate: Date;
+    date: number;
     passwordHash: string;
 }
 

@@ -14,8 +14,10 @@
     "type-check": "tsc"
   },
   "dependencies": {
+    "@ant-design/colors": "^7.0.0",
     "@decklist/api": "0.0.1",
     "@reduxjs/toolkit": "^1.8.1",
+    "antd": "^5.6.4",
     "cookie": "^0.5.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

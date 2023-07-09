@@ -28,32 +28,6 @@ async function pbkdf2(password: string, iterations = 1e5): Promise<string> {
     return compositeBase64;
 }
 
-export const onRequestPost: PagesFunction<Env> = async ({ env, params, request, waitUntil }) => {
-    const json = await request.json<any>();
-    const password = json.password as string;
-    const name = json.name as string;
-    const slug = params.slug as string;
-
-    if (!slug)
-        return new Response("Missing event slug", { status: 400, statusText: "Bad Request" });
-
-    if (!password)
-        return new Response("Missing password data", { status: 400, statusText: "Bad Request" });
-
-    const existingEvent = await env.db.get(`events:${slug}`);
-    if (existingEvent != null) {
-        return new Response(`${slug} already exists`, { status: 409, statusText: "Conflict" });
-    }
-
-    const passwordHash = await pbkdf2(password);
-    const event: Event = {
-        passwordHash
-    };
-    waitUntil(env.db.put(`events:${slug}`, JSON.stringify(event), { metadata: { name } }));
-
-    return new Response(`Created ${slug}`, { status: 201, statusText: "Created" });
-}
-
 export const onRequestDelete: PagesFunction<Env> = async ({ env, params, waitUntil }) => {
     const slug = params.slug as string;
     if (!slug)

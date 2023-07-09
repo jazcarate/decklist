@@ -139,6 +139,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env, waitUnti
     const jwt = await sign({ exp: Date.now() + ONE_MONTH, user: token }, env.SIGNING_SECRET);
     const newAuthCookie = serialize(AUTH_COOKIE, jwt, {
         httpOnly: true,
+        sameSite: true,
         secure: true,
         maxAge: ONE_MONTH
     });
