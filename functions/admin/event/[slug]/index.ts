@@ -1,4 +1,4 @@
-import { Event } from "@decklist/api";
+import { Event } from "../../../../api";
 
 interface Env {
     db: KVNamespace,

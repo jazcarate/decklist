@@ -1,4 +1,4 @@
-import { Entry, Status } from "@decklist/api";
+import { Entry, Status } from "../../../../api";
 
 interface Env {
     db: KVNamespace,

@@ -9,6 +9,7 @@
     "api",
     "backend/admin",
     "backend/email",
-    "frontend"
+    "frontend",
+    "functions"
   ]
 }
