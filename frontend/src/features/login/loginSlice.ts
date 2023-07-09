@@ -3,11 +3,11 @@ import { RootState } from "../../app/store"
 import { login } from "./loginAPI"
 
 export interface LoginState {
-    token: string | null
+    token: string
 }
 
 const initialState: LoginState = {
-    token: null
+    token: ""
 }
 
 export const loginAsync = createAsyncThunk(
@@ -25,7 +25,7 @@ export const loginSlice = createSlice({
     extraReducers: (builder) => {
         builder
             .addCase(loginAsync.pending, (state) => {
-                state.token = null
+                state.token = ""
             })
             .addCase(loginAsync.fulfilled, (state, action) => {
                 state.token = action.payload
