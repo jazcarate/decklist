@@ -1,5 +1,5 @@
 name = "email"
-main = "src/worker.ts"
+main = "src/email.ts"
 compatibility_date = "2023-06-28"
 
 kv_namespaces = [

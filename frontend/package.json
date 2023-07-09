@@ -14,17 +14,20 @@
     "type-check": "tsc"
   },
   "dependencies": {
+    "@decklist/api": "0.0.1",
     "@reduxjs/toolkit": "^1.8.1",
+    "cookie": "^0.5.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-redux": "^8.0.1",
-    "@decklist/api": "0.0.1"
+    "react-redux": "^8.0.1"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20230628.0",
     "@testing-library/dom": "^9.2.0",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^14.0.0",
     "@testing-library/user-event": "^14.2.5",
+    "@types/cookie": "^0.5.1",
     "@types/react": "^18.0.15",
     "@types/react-dom": "^18.0.6",
     "@types/testing-library__jest-dom": "^5.14.5",
@@ -35,7 +38,7 @@
     "jsdom": "^21.1.0",
     "prettier": "^2.7.1",
     "prettier-config-nick": "^1.0.2",
-    "typescript": "^5.0.2",
+    "typescript": "^5.1.6",
     "vite": "^4.0.0",
     "vitest": "^0.30.1"
   },
