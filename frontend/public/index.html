@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Decklist.fun</title>
+</head>
+
+<body>
+    <h1>Decklist.fun</h1>
+    <div hx-get="/test" hx-trigger="every 2s"></div>
+</body>
+<script src="/htmx.min.js"></script>
+<script>
+    fetch("/login", { method: "POST" });
+</script>
+
+</html>

@@ -1,5 +1,4 @@
 import PostalMime from "postal-mime";
-import { Entry, Status } from "@decklist/api";
 
 interface Env {
 	db: KVNamespace
@@ -38,10 +37,10 @@ export default {
 		const content = await readAll(message.raw, message.rawSize);
 		const email = await new PostalMime().parse(content);
 
-		const entry: Entry = {
+		const entry = {
 			from: message.from,
 			note: email.subject ?? "[No subject]",
-			status: Status.Pending
+			status: 0
 		};
 		const id = crypto.randomUUID();
 
