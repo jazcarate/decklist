@@ -1,92 +1,67 @@
-import { getToken } from "../../auth";
+import { renderFull } from "../../render";
+import list from "../../../templates/events/list.html";
+import login from "../../../templates/events/login.html";
+import { AUTH_COOKIE, User, pbkdf2Verify, sign } from "../../auth";
+import { serialize } from "cookie";
 
 interface Env {
-    db: KVNamespace
-    content: R2Bucket
+    db: KVNamespace,
+    ALL_ADMIN: boolean,
+    SIGNING_SECRET: string,
 }
 
-interface Metadata {
-    name?: string;
-}
+const ONE_MONTH = 2678400;
 
-
-async function pbkdf2(password: string, iterations = 1e5): Promise<string> {
-    const pwUtf8 = new TextEncoder().encode(password);
-    const pwKey = await crypto.subtle.importKey('raw', pwUtf8, 'PBKDF2', false, ['deriveBits']);
-
-    const saltUint8 = crypto.getRandomValues(new Uint8Array(16));
-
-    const params = { name: 'PBKDF2', hash: 'SHA-256', salt: saltUint8, iterations: iterations };
-    const keyBuffer = await crypto.subtle.deriveBits(params, pwKey, 256);
-
-    const keyArray = Array.from(new Uint8Array(keyBuffer));
-
-    const saltArray = Array.from(new Uint8Array(saltUint8));
-
-    const iterHex = ('000000' + iterations.toString(16)).slice(-6);
-    const iterArray = iterHex.match(/.{2}/g).map(byte => parseInt(byte, 16));
-
-    const compositeArray = [].concat(saltArray, iterArray, keyArray);
-    const compositeStr = compositeArray.map(byte => String.fromCharCode(byte)).join('');
-    const compositeBase64 = btoa('v01' + compositeStr);
-
-    return compositeBase64;
-}
-
-export const onRequestGet: PagesFunction<Env> = async ({ request, env, params }) => {
+export const onRequestGet: PagesFunction<Env> = async ({ env, params, data }) => {
+    const user = data.user as User | null;
     const slug = params.slug as string;
 
-    if (!slug)
-        return new Response("Missing event slug", { status: 400, statusText: "Bad Request" });
+    if (!user)
+        return renderFull(login, { title: `Login to ${slug}` });
 
-    const token = await getToken(request);
-    const authorized = await env.db.get(`token:${token}:event:${slug}`);
-    if (!authorized) {
-        return new Response("Forbidden", { status: 403, statusText: "Forbidden" });
-    }
+    const auth = await env.db.get(`user:${user.token}:event:${params.slug}`);
+    if (!auth)
+        return renderFull(login, { title: `Login to ${slug}` });
 
-    const event = await env.db.getWithMetadata<Metadata>(`events:${slug}`);
-    const prefix = `event:${slug}:entry:`;
-    const entriesKey = await env.db.list({ prefix });
-
-    const entriesText = await Promise.all(entriesKey.keys.map(entry => env.db.get(entry.name).then(t => [entry.name.substring(prefix.length), t])));
-    const entries = entriesText.map(([key, json]) => ({ ...JSON.parse(json), key }));
-
-    return Response.json({
-        name: event.metadata.name,
-        entries: entries
-    });
+    return renderFull(list, { slug, title: slug });
 }
 
-export const onRequestPost: PagesFunction<Env> = async ({ env, params, request, waitUntil }) => {
-    const json = await request.json<any>();
-    const password = json.password as string;
-    const name = json.name as string;
-    const date = json.date as number;
-    const slug = params.slug as string;
+export const onRequestPost: PagesFunction<Env> = async ({ request, env, params, waitUntil, data }) => {
+    const input = await request.formData();
+    let user = data.user as User | null;
 
-    if (!slug)
-        return new Response("Missing event slug", { status: 400, statusText: "Bad Request" });
+    const password = input.get("password") as string;
+    const slug = params.slug as string;
 
     if (!password)
         return new Response("Missing password data", { status: 400, statusText: "Bad Request" });
 
-    const existingEvent = await env.db.get(`events:${slug}`);
-    if (existingEvent != null) {
-        return new Response(`${slug} already exists`, { status: 409, statusText: "Conflict" });
+    if (user == null) {
+        user = {
+            token: crypto.randomUUID(),
+            admin: env.ALL_ADMIN
+        }
     }
 
-    const passwordHash = await pbkdf2(password);
-    const event = {
-        passwordHash,
-        date
-    };
+    const event = JSON.parse(await env.db.get(`events:${slug}`));
 
-    const token = await getToken(request);
-    waitUntil(Promise.all([
-        env.db.put(`events:${slug}`, JSON.stringify(event), { metadata: { name } }),
-        env.db.put(`token:${token}:event:${slug}`, new Date().toISOString()),
-    ]));
+    if (!event)
+        return new Response("Forbidden", { status: 403, statusText: "Forbidden" });
 
-    return new Response(`Created ${slug}`, { status: 201, statusText: "Created" });
+    if (!await pbkdf2Verify(event.passwordHash, password)) {
+        waitUntil(env.db.delete(`user:${user.token}:event:${slug}`));
+        return new Response("Forbidden", { status: 403, statusText: "Forbidden" });
+    }
+
+    waitUntil(env.db.put(`user:${user.token}:event:${slug}`, new Date().toISOString()));
+
+    const jwtCookie = await sign({ exp: Date.now() + ONE_MONTH, ...user }, env.SIGNING_SECRET);
+    const newAuthCookie = serialize(AUTH_COOKIE, jwtCookie, {
+        httpOnly: true,
+        sameSite: true,
+        secure: true,
+        maxAge: ONE_MONTH
+    });
+    let headers = new Headers([["Set-Cookie", newAuthCookie]]);
+    return new Response(null, { status: 204, statusText: "No Content", headers });
 }
