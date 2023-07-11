@@ -1,0 +1,15 @@
+<a href="/admin">Back</a>
+<br />
+<table>
+    <thead>
+        <tr>
+            <th>Token</th>
+            <th>Events</th>
+            </td>
+    </thead>
+    <tbody hx-confirm="Are you sure?" hx-target="closest li" hx-swap="outerHTML swap:0.3s">
+        {{#users}}
+        {{> row}}
+        {{/users}}
+    </tbody>
+</table>

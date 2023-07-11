@@ -1,0 +1,15 @@
+<tr>
+    <td>{{token}}</td>
+    <td>
+        <ul>
+            {{#events}}
+            <li>
+                <a href="/admin/{{.}}">{{.}}</a>
+                <button hx-delete="/admin/users/{{token}}/events/{{.}}">
+                    Delete
+                </button>
+            </li>
+            {{/events}}
+        </ul>
+    </td>
+</tr>

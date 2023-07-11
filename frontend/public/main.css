@@ -3,6 +3,11 @@
     transition: opacity 200ms ease-in;
 }
 
+tr.htmx-swapping td {
+    opacity: 0;
+    transition: opacity 0.3s ease-out;
+}
+
 .error {
     box-shadow: 0 0 3px #CC0000;
 }

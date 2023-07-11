@@ -24,11 +24,11 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, data, request, wa
     let user = data.user as User | null;
 
     if (!password || !slug)
-        return renderPartial(createEvent, { ...view, validated: true, });
+        return renderPartial(createEvent, { view: { ...view, validated: true, } });
 
     const existingEvent = await env.db.get(`events:${slug}`);
     if (existingEvent != null) {
-        return renderPartial(createEvent, { ...view, slugExists: true, validated: true, });
+        return renderPartial(createEvent, { view: { ...view, slugExists: true, validated: true, } });
     }
 
     const passwordHash = await pbkdf2(password);
@@ -59,7 +59,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, data, request, wa
         env.db.put(`user:${user.token}:event:${slug}`, new Date().toISOString()),
     ]));
 
-    return renderPartial(createdEvent, view, headers);
+    return renderPartial(createdEvent, { view, headers });
 }
 
 export const onRequestGet: PagesFunction<Env> = async ({ env }) => {

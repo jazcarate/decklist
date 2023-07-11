@@ -17,13 +17,15 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, params, data }) =>
     const slug = params.slug as string;
 
     if (!user)
-        return renderFull(login, { title: `Login to ${slug}`, slug });
+        return renderFull(login, { view: { title: `Login to ${slug}`, slug } });
 
-    const auth = await env.db.get(`user:${user.token}:event:${params.slug}`);
-    if (!auth)
-        return renderFull(login, { title: `Login to ${slug}`, slug });
+    if (!user.admin) {
+        const auth = await env.db.get(`user:${user.token}:event:${params.slug}`);
+        if (!auth)
+            return renderFull(login, { view: { title: `Login to ${slug}`, slug } });
+    }
 
-    return renderFull(list, { slug, title: slug });
+    return renderFull(list, { view: { slug, title: slug } });
 }
 
 export const onRequestPost: PagesFunction<Env> = async ({ request, env, params, waitUntil, data }) => {
@@ -36,7 +38,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env, params, 
     const view = { slug }
 
     if (!password)
-        return renderPartial(login, { ...view, validated: true });
+        return renderPartial(login, { view: { ...view, validated: true } });
 
     if (user == null) {
         user = {
@@ -48,11 +50,11 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env, params, 
     const event = JSON.parse(await env.db.get(`events:${slug}`));
 
     if (!event)
-        return renderPartial(login, { ...view, forbidden: true });
+        return renderPartial(login, { view: { ...view, forbidden: true } });
 
     if (!await pbkdf2Verify(event.passwordHash, password)) {
         waitUntil(env.db.delete(`user:${user.token}:event:${slug}`));
-        return renderPartial(login, { ...view, forbidden: true });
+        return renderPartial(login, { view: { ...view, forbidden: true } });
     }
 
     waitUntil(env.db.put(`user:${user.token}:event:${slug}`, new Date().toISOString()));
@@ -66,5 +68,5 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env, params, 
     });
     let headers = new Headers([["Set-Cookie", newAuthCookie]]);
 
-    return renderPartial(list, { slug, title: slug }, headers);
+    return renderPartial(list, { view: { slug, title: slug }, headers });
 }

@@ -1,9 +1,26 @@
+import { renderFull } from "../../render";
+import listUsers from "../../../templates/admin/users.html";
+import row from "../../../templates/admin/userRow.html";
+
 interface Env {
     db: KVNamespace
 }
 
-export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
-    const tokens = await env.db.list({ prefix: "token:" });
+function groupBy<value>(list: [string, value][]): { [key: string]: value[] } {
+    return list.reduce((acc, [key, value]) => {
+        acc[key] = acc[key] ?? [];
+        acc[key].push(value);
+        return acc;
+    }, {});
+}
 
-    return Response.json(tokens.keys);
+export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
+    const tokensKeys = (await env.db.list({ prefix: "user:" })).keys;
+    const users = groupBy(tokensKeys.map(key => {
+        const [_user, token, _event, slug] = key.name.split(":")
+        return [token, slug] as [string, string];
+    }));
+    const grouped = Object.entries(users).map(([token, events]) => ({ token, events }));
+
+    return renderFull(listUsers, { view: { users: grouped }, partials: { row } });
 }
