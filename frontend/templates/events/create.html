@@ -1,15 +1,25 @@
-<div>
-    Create a new event
-    <form>
-        <label for="name">name</label>
-        <input id="name" name="name" /><br />
+<form hx-post="" hx-indicator="#ind" hx-target="this" hx-swap="outerHTML">
+    <h2>Create a new event</h2>
 
-        <label for="name">slug</label>
-        <input id="slug" name="slug" /><br />
+    <label for="name">name</label>
+    <input id="name" name="name" value="{{name}}" />
+    <br />
 
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" /><br />
+    <label for="slug">slug</label>
+    <input id="slug" name="slug" value="{{slug}}" {{#validated}}{{#slugExists}}class="error"
+        {{/slugExists}}{{/validated}} />
+    {{#validated}}{{#slugExists}}
+    The slug is taken
+    {{/slugExists}}{{/validated}}
+    <br />
 
-        <input type="submit" />
-    </form>
-</div>
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" value="{{password}}" {{#validated}}{{^password}}class="error"
+        {{/password}}{{/validated}} />
+    {{#validated}}{{^password}}
+    You need to input a password
+    {{/password}}{{/validated}}
+    <br />
+
+    <input type="submit" /><img id="ind" src="/img/bars.svg" class="htmx-indicator" />
+</form>

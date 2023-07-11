@@ -3,8 +3,7 @@
 ## Development
 
 ```bash
-npm run dev -w backend/admin
-npm run dev -w frontend
+cd frontend && npm run dev
 ```
 
 KV:

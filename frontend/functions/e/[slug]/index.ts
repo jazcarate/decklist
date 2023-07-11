@@ -1,4 +1,4 @@
-import { renderFull } from "../../render";
+import { renderFull, renderPartial } from "../../render";
 import list from "../../../templates/events/list.html";
 import login from "../../../templates/events/login.html";
 import { AUTH_COOKIE, User, pbkdf2Verify, sign } from "../../auth";
@@ -17,11 +17,11 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, params, data }) =>
     const slug = params.slug as string;
 
     if (!user)
-        return renderFull(login, { title: `Login to ${slug}` });
+        return renderFull(login, { title: `Login to ${slug}`, slug });
 
     const auth = await env.db.get(`user:${user.token}:event:${params.slug}`);
     if (!auth)
-        return renderFull(login, { title: `Login to ${slug}` });
+        return renderFull(login, { title: `Login to ${slug}`, slug });
 
     return renderFull(list, { slug, title: slug });
 }
@@ -33,8 +33,10 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env, params, 
     const password = input.get("password") as string;
     const slug = params.slug as string;
 
+    const view = { slug }
+
     if (!password)
-        return new Response("Missing password data", { status: 400, statusText: "Bad Request" });
+        return renderPartial(login, { ...view, validated: true });
 
     if (user == null) {
         user = {
@@ -46,11 +48,11 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env, params, 
     const event = JSON.parse(await env.db.get(`events:${slug}`));
 
     if (!event)
-        return new Response("Forbidden", { status: 403, statusText: "Forbidden" });
+        return renderPartial(login, { ...view, forbidden: true });
 
     if (!await pbkdf2Verify(event.passwordHash, password)) {
         waitUntil(env.db.delete(`user:${user.token}:event:${slug}`));
-        return new Response("Forbidden", { status: 403, statusText: "Forbidden" });
+        return renderPartial(login, { ...view, forbidden: true });
     }
 
     waitUntil(env.db.put(`user:${user.token}:event:${slug}`, new Date().toISOString()));
@@ -63,5 +65,6 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env, params, 
         maxAge: ONE_MONTH
     });
     let headers = new Headers([["Set-Cookie", newAuthCookie]]);
-    return new Response(null, { status: 204, statusText: "No Content", headers });
+
+    return renderPartial(list, { slug, title: slug }, headers);
 }

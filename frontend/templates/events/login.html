@@ -1,9 +1,11 @@
-<div>
+<form hx-post="" hx-indicator="#ind" hx-target="this" hx-swap="outerHTML">
     Enter the password to see the event <code>{{slug}}</code><br />
-    <form method="post">
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" /><br />
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" {{#forbidden}}class="error" {{/forbidden}} />
+    {{#forbidden}}
+    Wrong password
+    {{/forbidden}}
+    <br />
 
-        <input type="submit" />
-    </form>
-</div>
+    <input type="submit" /><img id="ind" src="/img/bars.svg" class="htmx-indicator" />
+</form>

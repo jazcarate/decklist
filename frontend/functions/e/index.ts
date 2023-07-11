@@ -1,8 +1,9 @@
 import { serialize } from "cookie";
 import createEvent from "../../templates/events/create.html";
+import createdEvent from "../../templates/events/created.html";
 
 import { AUTH_COOKIE, User, pbkdf2, sign } from "../auth";
-import { renderFull } from "../render";
+import { renderFull, renderPartial } from "../render";
 
 interface Env {
     db: KVNamespace,
@@ -13,29 +14,26 @@ interface Env {
 const ONE_MONTH = 2678400;
 
 export const onRequestPost: PagesFunction<Env> = async ({ env, data, request, waitUntil }) => {
-    const json = await request.json<any>();
-    const password = json.password as string;
-    const name = json.name as string;
-    const date = json.date as number;
-    const slug = json.slug as string;
+    const json = await request.formData();
+    const password = json.get("password")
+    const name = json.get("name");
+    const slug = json.get("slug");
+
+    const view = { title: "New event", slug, password, name };
 
     let user = data.user as User | null;
 
-    if (!password)
-        return new Response("Missing password data", { status: 400, statusText: "Bad Request" });
-
-    if (!slug)
-        return new Response("Missing slug data", { status: 400, statusText: "Bad Request" });
+    if (!password || !slug)
+        return renderPartial(createEvent, { ...view, validated: true, });
 
     const existingEvent = await env.db.get(`events:${slug}`);
     if (existingEvent != null) {
-        return new Response(`${slug} already exists`, { status: 409, statusText: "Conflict" });
+        return renderPartial(createEvent, { ...view, slugExists: true, validated: true, });
     }
 
     const passwordHash = await pbkdf2(password);
     const event = {
-        passwordHash,
-        date
+        passwordHash
     };
 
     const headers = new Headers();
@@ -58,13 +56,10 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, data, request, wa
 
     waitUntil(Promise.all([
         env.db.put(`events:${slug}`, JSON.stringify(event), { metadata: { name } }),
-        env.db.put(`token:${user.token}:event:${slug}`, new Date().toISOString()),
+        env.db.put(`user:${user.token}:event:${slug}`, new Date().toISOString()),
     ]));
 
-    const url = new URL(request.url);
-    headers.append("Content-Length", "0");
-    headers.append("Location", `${url.protocol}//${url.host}/events/${slug}`);
-    return new Response(null, { status: 307, headers });
+    return renderPartial(createdEvent, view, headers);
 }
 
 export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
