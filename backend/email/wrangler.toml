@@ -9,3 +9,7 @@ kv_namespaces = [
 r2_buckets = [
     { binding = "content", bucket_name = "emails-content" } 
 ]
+
+send_email = [
+   {type = "send_email", name = "email"}
+]

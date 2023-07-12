@@ -1,8 +1,11 @@
 import PostalMime from "postal-mime";
+import { EmailMessage } from "cloudflare:email";
+import { createMimeMessage } from "mimetext";
 
 interface Env {
 	db: KVNamespace
-	content: R2Bucket
+	content: R2Bucket,
+	email: SendEmail
 }
 
 async function readAll(stream: ReadableStream, size: number): Promise<Uint8Array> {
@@ -27,15 +30,35 @@ function slugFrom(adress: string): string {
 export default {
 	async email(message: ForwardableEmailMessage, env: Env, ctx: ExecutionContext): Promise<void> {
 		const slug = slugFrom(message.to)
+		const content = await readAll(message.raw, message.rawSize);
+		const email = await new PostalMime().parse(content);
+
+
 		const event = await env.db.get(`events:${slug}`);
 		if (!event) {
 			console.log(`Discarding email from '${message.from}'. No event '${slug}'`);
-			message.setReject(`There is no '${slug}' event`);
+
+			const reply = createMimeMessage();
+			reply.setSender({
+				name: "Don't Reply", addr: message.to
+			});
+			const originalID = message.headers.get("Message-ID");
+			if (originalID) {
+				reply.setHeader("In-Reply-To", originalID);
+				reply.setHeader("References", originalID);
+			}
+			reply.setHeader("Auto-Submitted", "auto-replied");
+			reply.setRecipient(message.from);
+			reply.setSubject(email.subject ?? "Problem submitting the decklist");
+			reply.addMessage({
+				contentType: 'text/plain',
+				data: `Sorry!\nWe didn't find the event "${message.to}". Check with your tournament officials.`
+			});
+
+			await env.email.send(new EmailMessage(message.to, message.from, reply.asRaw()));
 			return;
 		}
 
-		const content = await readAll(message.raw, message.rawSize);
-		const email = await new PostalMime().parse(content);
 
 		const entry = {
 			from: message.from,
@@ -65,5 +88,26 @@ export default {
 			});
 			console.log(`Saved attachment '${attachmentKey}' ${obj.size}bytes`);
 		}));
+
+		const reply = createMimeMessage();
+		reply.setSender({
+			name: "Don't Reply", addr: message.to
+		});
+		const originalID = message.headers.get("Message-ID");
+		if (originalID) {
+			reply.setHeader("In-Reply-To", originalID);
+			reply.setHeader("References", originalID);
+		}
+		reply.setHeader("Message-ID", `${id}@${slug}.decklist.fun`);
+		reply.setHeader("Auto-Submitted", "auto-replied");
+		reply.setRecipient(message.from);
+		reply.setSubject(email.subject ?? "Decklist submitted correctly");
+		reply.addMessage({
+			contentType: 'text/plain',
+			data: `Your submittion has been accepted! With the id: ${id}.`
+		});
+
+		await env.email.send(new EmailMessage(message.to, message.from, reply.asRaw()));
+		console.log("Done");
 	},
 };
