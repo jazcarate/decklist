@@ -26,11 +26,11 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, params, request }
     const id = crypto.randomUUID();
     const key = `event:${slug}:entry:${id}`;
     await env.db.put(key, JSON.stringify(entry));
-    await Promise.all(attachments.map(async (attachment: any, idx: number) => {
+    await Promise.all(attachments.map(async (attachment, idx: number) => {
         const attachmentKey = `attachment:${id}:${idx + 1}`;
-        await env.content.put(attachmentKey, attachment.content, {
+        await env.content.put(attachmentKey, await attachment.arrayBuffer(), {
             httpMetadata: {
-                contentType: attachment.mimeType, contentDisposition: `attachment; filename="${attachment.filename}"`
+                contentType: attachment.type, contentDisposition: `attachment; filename="${attachment.name}"`
             }
         });
     }));
