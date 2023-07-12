@@ -1,0 +1,21 @@
+<li hx-indicator="#ind" hx-target="this">
+    <form>
+        <label for="slug">slug</label>
+        <input required name='slug' value="{{slug}}" /><br />
+
+        <label for="name">name</label>
+        <input required name='name' value="{{name}}" /><br />
+
+        <label for="password">password</label>
+        <input type="password" name='password' /><br />
+
+        <button hx-get="/admin/events/{{slug}}" hx-target="this" hx-swap="outerHTML">
+            # entries <img class="htmx-indicator" src="/img/bars.svg">
+        </button><br />
+
+        <button hx-put="/admin/events/{{slug}}">Edit</button>
+        <button hx-delete="/admin/events/{{slug}}" hx-confirm="Are you sure?">Delete</button>
+        <a href="/admin/events/{{slug}}/add">Add attachment</a>
+        <img id="ind" src="/img/bars.svg" class="htmx-indicator" /><br />
+    </form>
+</li>

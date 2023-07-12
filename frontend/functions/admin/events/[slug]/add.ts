@@ -1,25 +1,32 @@
+import { renderFull, renderPartial } from "../../../render";
+import add from "../../../../templates/admin/events/add.html"
+
 interface Env {
     db: KVNamespace,
     content: R2Bucket,
 }
 
-export const onRequestPost: PagesFunction<Env> = async ({ env, params, request, waitUntil }) => {
-    const json = await request.json<any>();
-    const slug = params.slug as string;
+export const onRequestGet: PagesFunction<Env> = async ({ env, params, request }) => {
+    return renderFull(add);
+}
 
-    if (!slug)
-        return new Response("Missing event slug", { status: 400, statusText: "Bad Request" });
+export const onRequestPost: PagesFunction<Env> = async ({ env, params, request }) => {
+    const form = await request.formData();
+    const slug = params.slug as string;
 
     // TODO: Duplicated from Email worker
     const entry = {
-        from: json.from,
-        note: json.subject ?? "[No subject]",
+        from: form.get("from"),
+        note: form.get("subject") ?? "[No subject]",
         status: 0
     };
+
+    const attachments = form.getAll("attachments") as unknown as File[];
+
     const id = crypto.randomUUID();
     const key = `event:${slug}:entry:${id}`;
     await env.db.put(key, JSON.stringify(entry));
-    await Promise.all(json.attachments.map(async (attachment: any, idx: number) => {
+    await Promise.all(attachments.map(async (attachment: any, idx: number) => {
         const attachmentKey = `attachment:${id}:${idx + 1}`;
         await env.content.put(attachmentKey, attachment.content, {
             httpMetadata: {
@@ -28,5 +35,6 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, params, request, 
         });
     }));
 
-    return new Response(`Created entry ${id} for ${slug} (with ${json.attachments.length} attachments)`, { status: 201, statusText: "Created" });
+    console.log(`Created entry ${id} for ${slug} (with ${attachments.length} attachments)`);
+    return renderPartial(add, { view: { notice: `Created ${id}` } });
 }

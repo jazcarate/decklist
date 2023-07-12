@@ -1,6 +1,6 @@
 import { renderFull } from "../../render";
-import listUsers from "../../../templates/admin/users.html";
-import row from "../../../templates/admin/userRow.html";
+import listUsers from "../../../templates/admin/users/index.html";
+import row from "../../../templates/admin/users/userRow.html";
 
 interface Env {
     db: KVNamespace

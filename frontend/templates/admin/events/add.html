@@ -1,0 +1,13 @@
+<form hx-post="" hx-encoding="multipart/form-data" hx-target="this"><!-- TODO: Render progress htmx:xhr:progress -->
+    {{notice}}<br />
+
+    <label for="from">from</label>
+    <input required name='from' value="{{from}}" /><br />
+    <label for="subject">subject</label>
+    <input name='subject' value="{{subject}}" /><br />
+
+    <label for="attachments">attachments</label>
+    <input type="file" multiple name="attachments" /><br />
+
+    <input type="submit" />
+</form>
