@@ -16,7 +16,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, request }) => {
     const [token, password] = atob(auth.substring("Basic ".length)).split(":", 2);
 
     if (password !== env.ADMIN_PASSWORD) {
-        return new Response("", { status: 403, statusText: "Forbidden" })
+        return new Response("", { headers: new Headers([["WWW-Authenticate", "Basic"]]), status: 403, statusText: "Forbidden" })
     }
     console.log("New admin!");
 
