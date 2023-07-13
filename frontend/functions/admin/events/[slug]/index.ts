@@ -1,11 +1,13 @@
-import { pbkdf2 } from "../../../auth";
 import { renderPartial } from "../../../render";
 import row from "../../../../templates/admin/events/eventRow.html";
-import eventInfo from "../../../../templates/admin/events/eventInfo.html";
 
 interface Env {
     db: KVNamespace,
     content: R2Bucket,
+}
+
+interface Metadata {
+    name: string,
 }
 
 export const onRequestDelete: PagesFunction<Env> = async ({ env, params }) => {
@@ -34,14 +36,13 @@ export const onRequestPut: PagesFunction<Env> = async ({ env, params, request })
     const form = await request.formData();
     const slug = params.slug as string;
 
-    const password = form.get("password") as string | null;
+    const newSecret = form.get("secret") as string | null;
     const newSlug = form.get("slug") as string;
     const name = form.get("name") as string;
+    const size = form.get("size") as string | null;
 
     const oldEventKey = `events:${slug}`;
-    let { passwordHash } = JSON.parse(await env.db.get(oldEventKey));
-    if (password)
-        passwordHash = await pbkdf2(password);
+    let { secret } = JSON.parse(await env.db.get(oldEventKey));
 
     if (slug !== newSlug) {
         console.log(`Migration ${slug} to ${newSlug}`);
@@ -58,16 +59,18 @@ export const onRequestPut: PagesFunction<Env> = async ({ env, params, request })
         }
     }
 
+    await env.db.put(`events:${newSlug}`, JSON.stringify({ secret: newSecret ?? secret }), { metadata: { name } });
 
-    await env.db.put(`events:${newSlug}`, JSON.stringify({ passwordHash }), { metadata: { name } });
-
-    return renderPartial(row, { view: { name, slug: newSlug } });
+    return renderPartial(row, { name, size: String(size), slug: newSlug, secret: newSecret });
 }
 
 export const onRequestGet: PagesFunction<Env> = async ({ env, params, request }) => {
     const slug = params.slug as string;
 
+    const dbEvent = await env.db.getWithMetadata<Metadata>(`events:${slug}`);
+    const { secret } = JSON.parse(dbEvent.value);
+    const { name } = dbEvent.metadata;
     const entries = await env.db.list({ prefix: `event:${slug}:entry:` });
 
-    return renderPartial(eventInfo, { view: { size: entries.keys.length } });
+    return renderPartial(row, { size: String(entries.keys.length), secret, name, slug });
 }

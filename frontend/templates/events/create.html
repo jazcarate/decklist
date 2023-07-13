@@ -13,13 +13,5 @@
     {{/slugExists}}{{/validated}}
     <br />
 
-    <label for="password">Password</label>
-    <input type="password" id="password" name="password" value="{{password}}" {{#validated}}{{^password}}class="error"
-        {{/password}}{{/validated}} />
-    {{#validated}}{{^password}}
-    You need to input a password
-    {{/password}}{{/validated}}
-    <br />
-
     <input type="submit" /><img id="ind" src="/img/bars.svg" class="htmx-indicator" />
 </form>

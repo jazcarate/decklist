@@ -36,5 +36,5 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, params, request }
     }));
 
     console.log(`Created entry ${id} for ${slug} (with ${attachments.length} attachments)`);
-    return renderPartial(add, { view: { notice: `Created ${id}` } });
+    return renderPartial(add, { notice: `Created ${id}` });
 }

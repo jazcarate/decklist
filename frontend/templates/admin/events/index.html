@@ -1,6 +1,10 @@
 <a href="/admin">Back</a>
 <br />
 
+
+(changing the event secret does not invalidate current loged in users. To do this, go to <a
+    href="/admin/users/">Admin/Users</a>)
+
 <ul hx-swap="outerHTML swap:0.3s">
     {{#events}}
     {{> row}}

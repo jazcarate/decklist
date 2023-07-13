@@ -20,13 +20,13 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, request }) => {
     }
     console.log("New admin!");
 
-    // TODO duplicated de [slug]/login.ts
+    // TODO duplicated of authentication in root _middleware
     const user = {
         token: token,
         admin: true,
     }
 
-    const jwtCookie = await sign({ ...user }, env.SIGNING_SECRET);
+    const jwtCookie = await sign(user, env.SIGNING_SECRET);
     const newAuthCookie = serialize(AUTH_COOKIE, jwtCookie, {
         httpOnly: true,
         sameSite: true,

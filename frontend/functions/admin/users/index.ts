@@ -22,5 +22,5 @@ export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
     }));
     const grouped = Object.entries(users).map(([token, events]) => ({ token, events }));
 
-    return renderFull(listUsers, { view: { users: grouped }, partials: { row } });
+    return renderFull(listUsers, { users: grouped }, { row });
 }

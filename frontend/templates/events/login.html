@@ -1,11 +1,13 @@
-<form hx-post="" hx-indicator="#ind" hx-target="this" hx-swap="outerHTML">
-    Enter the password to see the event <code>{{slug}}</code><br />
-    <label for="password">Password</label>
-    <input type="password" id="password" name="password" {{#forbidden}}class="error" {{/forbidden}} />
+<form hx-get="/e/{{slug}}/login" hx-target="this" hx-swap="outerHTML">
+    Enter the secret to see the event <code>{{slug}}</code> (three word key. Like
+    <code>acute-fuchsia-crane</code>)<br />
+
+    <label for="p">Secret</label>
+    <input id="p" name="p" {{#forbidden}}class="error" {{/forbidden}} />
     {{#forbidden}}
-    Wrong password
+    Wrong key.
     {{/forbidden}}
     <br />
 
-    <input type="submit" /><img id="ind" src="/img/bars.svg" class="htmx-indicator" />
+    <input type="submit" /><img src="/img/bars.svg" class="htmx-indicator" />
 </form>

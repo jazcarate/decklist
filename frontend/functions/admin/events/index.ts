@@ -19,5 +19,5 @@ export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
         slug: event.name.substring(prefix.length)
     }))
 
-    return renderFull(listEvents, { view: { events }, partials: { row } });
+    return renderFull(listEvents, { events }, { row });
 }
