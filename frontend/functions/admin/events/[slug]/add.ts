@@ -1,5 +1,5 @@
 import { renderFull, renderPartial } from "../../../render";
-import html from "../../../../templates/admin/events/details/attachments.html"
+import attachment from "../../../../templates/admin/events/details/attachment.html"
 
 interface Env {
     db: KVNamespace,
@@ -22,9 +22,9 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, params, request }
     const id = crypto.randomUUID();
     const key = `event:${slug}:entry:${id}`;
     await env.db.put(key, JSON.stringify(entry));
-    await Promise.all(attachments.map(async (attachment, idx: number) => {
+    const objects = await Promise.all(attachments.map(async (attachment, idx: number) => {
         const attachmentKey = `attachment:${id}:${idx + 1}`;
-        await env.content.put(attachmentKey, await attachment.arrayBuffer(), {
+        return env.content.put(attachmentKey, await attachment.arrayBuffer(), {
             httpMetadata: {
                 contentType: attachment.type, contentDisposition: `attachment; filename="${attachment.name}"`
             }
@@ -32,5 +32,5 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, params, request }
     }));
 
     console.log(`Created entry ${id} for ${slug} (with ${attachments.length} attachments)`);
-    return renderPartial(html, { notice: `Created ${id}` });
+    return renderPartial(attachment, objects.map(o => ({ name: o.key })));
 }

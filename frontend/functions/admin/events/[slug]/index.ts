@@ -1,7 +1,7 @@
 import { renderFull, renderPartial } from "../../../render";
 import details from "../../../../templates/admin/events/details/index.html";
 import event from "../../../../templates/admin/events/details/event.html";
-import attachments from "../../../../templates/admin/events/details/attachments.html";
+import attachment from "../../../../templates/admin/events/details/attachment.html";
 
 interface Env {
     db: KVNamespace,
@@ -74,7 +74,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, params }) => {
     const dbEvent = await env.db.getWithMetadata<Metadata>(`events:${slug}`);
     const { secret } = JSON.parse(dbEvent.value);
     const { name } = dbEvent.metadata;
-    const entries = await env.db.list({ prefix: `event:${slug}:entry:` });
+    const attachments = (await env.db.list({ prefix: `event:${slug}:entry:` })).keys;
 
-    return renderFull(details, { size: String(entries.keys.length), entries, secret, name, slug }, { event, attachments });
+    return renderFull(details, { attachments, secret, name, slug }, { event, attachment });
 }

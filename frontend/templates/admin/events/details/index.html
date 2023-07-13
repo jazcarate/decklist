@@ -8,7 +8,7 @@
 
 <h2>Add attachment</h2>
 <form id="attachment-upload" hx-post="/admin/events/{{slug}}/add" hx-encoding="multipart/form-data"
-    hx-target="#attachments">
+    hx-target="#attachments" hx-swap="beforeend">
     <label for="from">from</label>
     <input required name='from' value="{{from}}" /><br />
     <label for="subject">subject</label>
@@ -26,4 +26,8 @@
     });
 </script>
 
-{{> attachments}}
+<div id="attachments">
+    {{#attachments}}
+    {{> attachment}}
+    {{/attachments}}
+</div>
