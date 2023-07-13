@@ -5,6 +5,7 @@
             {{#events}}
             <li>
                 <a href="/e/{{.}}">{{.}}</a>
+                <a href="/admin/events/{{.}}">Admin</a>
                 <button hx-delete="/admin/users/{{token}}/events/{{.}}">
                     Delete
                 </button>

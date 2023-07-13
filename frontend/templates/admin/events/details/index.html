@@ -1,0 +1,29 @@
+<a href="/admin/events">All events</a>
+
+(changing the event secret does not invalidate current loged in users. To do this, go to <a
+    href="/admin/users/">Admin/Users</a>)
+
+<h2>Event</h2>
+{{> event}}
+
+<h2>Add attachment</h2>
+<form id="attachment-upload" hx-post="/admin/events/{{slug}}/add" hx-encoding="multipart/form-data"
+    hx-target="#attachments">
+    <label for="from">from</label>
+    <input required name='from' value="{{from}}" /><br />
+    <label for="subject">subject</label>
+    <input name='subject' value="{{subject}}" /><br />
+
+    <label for="attachments">attachments</label>
+    <input type="file" multiple name="attachments" /><br />
+
+    <input type="submit" />
+    <progress id='progress' value='0' max='100'></progress>
+</form>
+<script>
+    htmx.on('#attachment-upload', 'htmx:xhr:progress', function (evt) {
+        htmx.find('#progress').setAttribute('value', evt.detail.loaded / evt.detail.total * 100)
+    });
+</script>
+
+{{> attachments}}

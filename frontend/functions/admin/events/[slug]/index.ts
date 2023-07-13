@@ -1,5 +1,7 @@
-import { renderPartial } from "../../../render";
-import row from "../../../../templates/admin/events/eventRow.html";
+import { renderFull, renderPartial } from "../../../render";
+import details from "../../../../templates/admin/events/details/index.html";
+import event from "../../../../templates/admin/events/details/event.html";
+import attachments from "../../../../templates/admin/events/details/attachments.html";
 
 interface Env {
     db: KVNamespace,
@@ -61,10 +63,12 @@ export const onRequestPut: PagesFunction<Env> = async ({ env, params, request })
 
     await env.db.put(`events:${newSlug}`, JSON.stringify({ secret: newSecret ?? secret }), { metadata: { name } });
 
-    return renderPartial(row, { name, size: String(size), slug: newSlug, secret: newSecret });
+    const response = renderPartial(event, { name, size: String(size), slug: newSlug, secret: newSecret });
+    response.headers.append("HX-Push", request.url.replaceAll(slug, newSlug));
+    return response;
 }
 
-export const onRequestGet: PagesFunction<Env> = async ({ env, params, request }) => {
+export const onRequestGet: PagesFunction<Env> = async ({ env, params }) => {
     const slug = params.slug as string;
 
     const dbEvent = await env.db.getWithMetadata<Metadata>(`events:${slug}`);
@@ -72,5 +76,5 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, params, request })
     const { name } = dbEvent.metadata;
     const entries = await env.db.list({ prefix: `event:${slug}:entry:` });
 
-    return renderPartial(row, { size: String(entries.keys.length), secret, name, slug });
+    return renderFull(details, { size: String(entries.keys.length), entries, secret, name, slug }, { event, attachments });
 }

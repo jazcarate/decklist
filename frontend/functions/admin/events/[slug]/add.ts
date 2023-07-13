@@ -1,13 +1,9 @@
 import { renderFull, renderPartial } from "../../../render";
-import add from "../../../../templates/admin/events/add.html"
+import html from "../../../../templates/admin/events/details/attachments.html"
 
 interface Env {
     db: KVNamespace,
     content: R2Bucket,
-}
-
-export const onRequestGet: PagesFunction<Env> = async ({ env, params, request }) => {
-    return renderFull(add);
 }
 
 export const onRequestPost: PagesFunction<Env> = async ({ env, params, request }) => {
@@ -36,5 +32,5 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, params, request }
     }));
 
     console.log(`Created entry ${id} for ${slug} (with ${attachments.length} attachments)`);
-    return renderPartial(add, { notice: `Created ${id}` });
+    return renderPartial(html, { notice: `Created ${id}` });
 }
