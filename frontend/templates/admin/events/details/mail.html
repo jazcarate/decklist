@@ -1,0 +1,24 @@
+<form hx-put="/admin/events/{{slug}}/mails/{{id}}" hx-encoding="multipart/form-data" hx-target="this">
+    ({{id}})
+
+    <label for="note">note</label>
+    <input name='note' value="{{note}}" /><br />
+
+    <input type="hidden" name='from' value="{{from}}" />
+    From: {{from}}<br />
+
+    <label for="name">name</label>
+    <input required name='name' value="{{name}}" /><br />
+
+    <label for="reviewed">reviewed</label>
+    <input type="checkbox" name='reviewed' value="{{#reviewed}}true{{/reviewed}}{{^reviewed}}false{{/reviewed}}">
+    <br />
+
+    <input type="submit" />
+    <button hx-delete="/admin/events/{{slug}}/mails/{{id}}"
+        hx-confirm="Are you sure you want to delete email from {{from}}?">Delete</button><br />
+
+    <button hx-get="/e/{{slug}}/mail/{{id}}" hx-target="this" hx-swap="outerHTML">
+        Load attachments... <img class="htmx-indicator" src="/img/bars.svg">
+    </button>
+</form>

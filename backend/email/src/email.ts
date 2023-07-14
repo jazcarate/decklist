@@ -27,12 +27,17 @@ function slugFrom(adress: string): string {
 	return adress.split("@", 1)[0];
 }
 
+function randId() {
+	var arr = new Uint8Array(3)
+	crypto.getRandomValues(arr)
+	return Array.from(arr, v => v.toString(16).padStart(2, "0")).join('')
+}
+
 export default {
 	async email(message: ForwardableEmailMessage, env: Env, ctx: ExecutionContext): Promise<void> {
 		const slug = slugFrom(message.to)
 		const content = await readAll(message.raw, message.rawSize);
 		const email = await new PostalMime().parse(content);
-
 
 		const event = await env.db.get(`events:${slug}`);
 		if (!event) {
@@ -59,34 +64,32 @@ export default {
 			return;
 		}
 
+		const id = randId();
+		const from = message.from;
+		const note = email.subject;
+		const date = Date.now();
 
-		const entry = {
-			from: message.from,
-			note: email.subject ?? "[No subject]",
-			status: 0
-		};
-		const id = crypto.randomUUID();
+		await env.db.put(`event:${slug}:mail:${id}`,
+			JSON.stringify({ date }),
+			{ metadata: { from, name: from, note, reviewed: false } });
 
-		const key = `event:${slug}:entry:${id}`;
-		await env.db.put(key, JSON.stringify(entry));
-		console.log(`Saved entry '${key}'`);
+		console.log(`Saved email ${id}`);
 
-		const bodyKey = `attachment:${id}:0`;
-		await env.content.put(bodyKey, `${email.subject}\n\n${email.text}`, {
+		const bodyKey = `event:${slug}:mail:${id}:`;
+		await env.content.put(bodyKey + "0", `${email.subject}\n\n${email.text}`, {
 			httpMetadata: {
-				contentType: "text/plain", contentDisposition: `attachment; filename="body.txt"`
+				contentType: "text/plain", contentDisposition: `inline; filename="body.txt"`
 			}
 		});
-		console.log(`Saved body attachment '${bodyKey}'`);
+		console.log(`Saved attachment '0'`);
 
 		await Promise.all(email.attachments.map(async (attachment, idx) => {
-			const attachmentKey = `attachment:${id}:${idx + 1}`;
-			const obj = await env.content.put(attachmentKey, attachment.content, {
+			const obj = await env.content.put(bodyKey + String(idx + 1), attachment.content, {
 				httpMetadata: {
-					contentType: attachment.mimeType, contentDisposition: `attachment; filename="${attachment.filename}"`
+					contentType: attachment.mimeType, contentDisposition: `inline; filename="${attachment.filename}"`
 				}
 			});
-			console.log(`Saved attachment '${attachmentKey}' ${obj.size}bytes`);
+			console.log(`Saved attachment '${idx + 1}' ${obj.size}bytes`);
 		}));
 
 		const reply = createMimeMessage();
@@ -104,7 +107,7 @@ export default {
 		reply.setSubject(email.subject ?? "Decklist submitted correctly");
 		reply.addMessage({
 			contentType: 'text/plain',
-			data: `Your submittion has been accepted! With the id: ${id}.`
+			data: `Your submittion has been accepted! With the id: ev${slug}-em${id}.`
 		});
 
 		await env.email.send(new EmailMessage(message.to, message.from, reply.asRaw()));

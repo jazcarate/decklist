@@ -10,9 +10,9 @@ To make yourself an admin, go to <http://127.0.0.1:8788/makeAdmin> and use `123`
 
 KV:
 events:[slug] -> {secret} (metadata: name)
-event:[slug]:entry:[uuid] -> {from, status: [PENDING, CHECKED, IGNORED]}
+event:[slug]:mail:[id] -> {date: number} (metadata: from, name, note?, reviewed: false)
 
 user:[token]:event:[slug] -> timestamp
 
 R2:
-attachment:[entry_uuid]:[#] -> {r2_link}
+event:[slug]:mail:[id]:[#]
