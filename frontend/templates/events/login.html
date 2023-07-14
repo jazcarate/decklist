@@ -3,7 +3,7 @@
     <code>acute-fuchsia-crane</code>)<br />
 
     <label for="p">Secret</label>
-    <input id="p" name="p" {{#forbidden}}class="error" {{/forbidden}} />
+    <input required id="p" name="p" {{#forbidden}}class="error" {{/forbidden}} />
     {{#forbidden}}
     Wrong key.
     {{/forbidden}}

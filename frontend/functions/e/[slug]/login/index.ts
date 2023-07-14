@@ -9,33 +9,47 @@ interface Env {
 }
 
 export const onRequestGet: PagesFunction<Env> = async ({ env, params, data, request }) => {
+    const url = new URL(request.url);
     const user = data.user as User;
     const slug = params.slug as string;
     const inputSecret = new URL(request.url).searchParams.get("p");
 
-    const renderer = Boolean(request.headers.get("HX-Request")) ? renderPartial : renderFull;
+    async function loggedIn(): Promise<'yes' | 'no' | 'forbidden'> {
+        if (!inputSecret)
+            return 'no';
 
-    if (!inputSecret)
-        return renderer(login, { title: `Login to ${slug}`, slug });
+        const event = JSON.parse(await env.db.get(`events:${slug}`));
+        if (!event)
+            return 'forbidden';
 
-    const event = JSON.parse(await env.db.get(`events:${slug}`));
-    if (!event)
-        return renderer(login, { title: `Login to ${slug}`, slug, forbidden: true });
+        const { secret } = event;
+        if (inputSecret != secret)
+            return 'forbidden';
 
-    const { secret } = event;
-    if (inputSecret != secret)
-        return renderer(login, { title: `Login to ${slug}`, slug, forbidden: true });
+        return 'yes';
+    }
 
-    await env.db.put(`user:${user.token}:event:${slug}`, new Date().toISOString());
+    const isHtmx = Boolean(request.headers.get("HX-Request"));
+    const renderer = isHtmx ? renderPartial : renderFull;
 
-    const url = new URL(request.url);
-    const headers = new Headers([
-        ["Location", `${url.protocol}//${url.host}/e/${slug}`],
-        //TODO when loggin in by HTMX the swap is wrong. Go to an event, put in the correct password. You see two H1
-        ["HX-Redirect", `${url.protocol}//${url.host}/e/${slug}`],
-    ]);
+    const isLogged = await loggedIn();
+    console.log({ isLogged });
 
-    return new Response("", {
-        headers, status: 307, statusText: "Temporary Redirect"
-    });
+    switch (isLogged) {
+        case 'no': return renderer(login, { title: `Login to ${slug}`, slug });
+        case 'forbidden': return renderer(login, { title: `Login to ${slug}`, slug, forbidden: true });
+        case 'yes':
+            await env.db.put(`user:${user.token}:event:${slug}`, new Date().toISOString());
+
+            const location = `${url.protocol}//${url.host}/e/${slug}`;
+            if (isHtmx) {
+                const headers = new Headers([["HX-Redirect", location]]);
+                return new Response("", { status: 204, headers });
+            } else {
+                const headers = new Headers([["Location", location]]);
+                return new Response("", {
+                    headers, status: 307, statusText: "Temporary Redirect"
+                });
+            }
+    }
 }
