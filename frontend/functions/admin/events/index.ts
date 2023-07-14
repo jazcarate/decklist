@@ -24,7 +24,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, request }) => {
     })).filter(({ name, slug }) => {
         if (q == null) return true;
         return name.includes(q) || slug.includes(q);
-    })
+    });
 
     if (q == null) {
         return renderFull(listEvents, { events }, { row, events: eventsResult })

@@ -1,5 +1,13 @@
 <a href="/admin">Back</a>
 <br />
+
+<input type="search" name="qtoken" value="{{qtoken}}" placeholder="Search Users..." hx-get="/admin/users"
+    hx-trigger="keyup changed delay:500ms, search" hx-target="#search-results" hx-indicator=".htmx-indicator">
+<input type="search" name="qevent" value="{{qevent}}" placeholder="Search Events..." hx-get="/admin/users"
+    hx-trigger="keyup changed delay:500ms, search" hx-target="#search-results" hx-indicator=".htmx-indicator">
+<span class="htmx-indicator"><img src="/img/bars.svg" /> Searching...</span>
+
+
 <table>
     <thead>
         <tr>
@@ -7,9 +15,7 @@
             <th>Events</th>
         </tr>
     </thead>
-    <tbody hx-confirm="Are you sure?" hx-target="closest li" hx-swap="outerHTML swap:0.3s">
-        {{#users}}
-        {{> row}}
-        {{/users}}
+    <tbody id="search-results" hx-confirm="Are you sure?" hx-target="closest li" hx-swap="outerHTML swap:0.3s">
+        {{> users}}
     </tbody>
 </table>
