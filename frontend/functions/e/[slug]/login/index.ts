@@ -18,11 +18,10 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, params, data, requ
         if (!inputSecret)
             return 'no';
 
-        const event = JSON.parse(await env.db.get(`events:${slug}`));
-        if (!event)
+        const secret = await env.db.get(`events:${slug}`);
+        if (!secret)
             return 'forbidden';
 
-        const { secret } = event;
         if (inputSecret != secret)
             return 'forbidden';
 

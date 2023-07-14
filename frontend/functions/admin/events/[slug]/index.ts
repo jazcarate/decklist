@@ -44,7 +44,7 @@ export const onRequestPut: PagesFunction<Env> = async ({ env, params, request })
     const size = form.get("size") as string | null;
 
     const oldEventKey = `events:${slug}`;
-    let { secret } = JSON.parse(await env.db.get(oldEventKey));
+    let secret = await env.db.get(oldEventKey);
 
     if (slug !== newSlug) {
         console.log(`Migration ${slug} to ${newSlug}`);
@@ -61,7 +61,7 @@ export const onRequestPut: PagesFunction<Env> = async ({ env, params, request })
         }
     }
 
-    await env.db.put(`events:${newSlug}`, JSON.stringify({ secret: newSecret ?? secret }), { metadata: { name } });
+    await env.db.put(`events:${newSlug}`, newSecret ?? secret, { metadata: { name } });
 
     const response = renderPartial(event, { name, size: String(size), slug: newSlug, secret: newSecret });
     response.headers.append("HX-Push", request.url.replaceAll(slug, newSlug));
@@ -72,7 +72,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, params }) => {
     const slug = params.slug as string;
 
     const dbEvent = await env.db.getWithMetadata<Metadata>(`events:${slug}`);
-    const { secret } = JSON.parse(dbEvent.value);
+    const secret = dbEvent.value;
     const { name } = dbEvent.metadata;
     const prefix = `event:${slug}:mail:`;
     const mails = (await env.db.list<any>({ prefix })).keys
