@@ -19,8 +19,6 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env, params })
     if (object.httpMetadata?.contentType)
         headers.set("Content-Type", object.httpMetadata?.contentType);
 
-    console.log(`Serving ev${slug}-em${mail}-i${idx} (${object.size}b size)`);
-
     return new Response(object.body, {
         headers,
         status: 200
