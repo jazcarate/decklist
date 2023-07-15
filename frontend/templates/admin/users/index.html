@@ -3,21 +3,44 @@
 
 <form action="/admin/users" method="get" hx-trigger="keyup change from:input delay:500ms, submit, search"
     hx-select="#search-results" hx-target="#search-results" hx-swap="outerHTML">
-    <input type="search" name="qtoken" value="{{qtoken}}" placeholder="Search Users...">
     <input type="search" name="qevent" value="{{qevent}}" placeholder="Search Events...">
+    <input type="search" name="qtoken" value="{{qtoken}}" placeholder="Search Users...">
     <span class="htmx-indicator"><img src="/img/bars.svg" /> Searching...</span>
     <input type="submit">
 </form>
 
-
 <table>
     <thead>
         <tr>
-            <th>Token</th>
-            <th>Events</th>
+            <th>Slug</th>
+            <th>Users</th>
         </tr>
     </thead>
     <tbody id="search-results">
-        {{> users}}
+        {{#users}}
+        <tr>
+            <td>
+                <a href="/e/{{slug}}">{{slug}}</a>
+                <a href="/admin/events/{{slug}}">Admin</a>
+            </td>
+            <td>
+                <ul>
+                    {{#tokens}}
+                    <li>
+                        {{.}}
+                        <button hx-push-url="false" hx-delete="/admin/users/{{.}}/events/{{slug}}"
+                            hx-confirm="Are you sure you want to logout {{.}} from {{slug}}?" hx-target="closest li"
+                            hx-swap="outerHTML swap:0.3s">
+                            Delete
+                        </button>
+                    </li>
+                    {{/tokens}}
+                </ul>
+            </td>
+        </tr>
+        {{/users}}
+        {{^users}}
+        No events
+        {{/users}}
     </tbody>
 </table>

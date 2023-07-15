@@ -84,7 +84,15 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, params, request }
                 console.log(` - Object ${newObjKey}`);
             }
 
-            const users = await env.db.list({ prefix: `event:${slug}` })
+            const userPrefix = `user:${slug}:`;
+            const users = await env.db.list({ prefix: userPrefix });
+            for (const user of users.keys) {
+                const oldUser = await env.db.get(user.name);
+                await env.db.delete(user.name);
+                await env.db.put(user.name.replace(slug, newSlug), oldUser);
+
+                console.log(` - User ${user.name.substring(userPrefix.length)}`);
+            }
         }
     }
 

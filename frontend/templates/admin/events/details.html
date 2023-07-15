@@ -4,7 +4,22 @@
     href="/admin/users?qevent={{slug}}">Admin/Users</a>)
 
 <h2>Event</h2>
-{{> adminEvent}}
+<form id="adminEvent" action="/admin/events/{{slug}}" method="post" hx-select="#adminEvent" hx-target="this"
+    hx-swap="outerHTML" hx-indicator=".htmx-indicator">
+    <hr />
+    <label for="slug">slug</label>
+    <input required name='slug' value="{{slug}}" /><br />
+
+    <label for="name">name</label>
+    <input required name='name' value="{{name}}" /><br />
+
+    <label for="secret">secret</label>
+    <input name='secret' value="{{secret}}" />
+
+    <button>Edit</button>
+    <button hx-delete="/admin/events/{{slug}}" hx-confirm="Are you sure?">Delete</button>
+    <img src="/img/bars.svg" class="htmx-indicator" /><br />
+</form>
 
 <h2>Add attachment</h2>
 <form hx-push-url="false" id="attachment-upload" action="/admin/events/{{slug}}/add" method="post"

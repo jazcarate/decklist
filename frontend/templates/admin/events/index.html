@@ -17,6 +17,15 @@
         </tr>
     </thead>
     <tbody id="search-results">
-        {{> events}}
+        {{#events}}
+        <tr>
+            <td><a href="/e/{{slug}}">{{slug}}</a></td>
+            <td>{{name}}</td>
+            <td><a href="/admin/events/{{slug}}">Edit</a></td>
+        </tr>
+        {{/events}}
+        {{^events}}
+        No events
+        {{/events}}
     </tbody>
 </table>

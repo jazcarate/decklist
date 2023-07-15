@@ -1,7 +1,5 @@
 import { renderFull, renderPartial } from "../../render";
 import listUsers from "../../../templates/admin/users/index.html";
-import userResult from "../../../templates/admin/users/users.html";
-import row from "../../../templates/admin/users/userRow.html";
 
 interface Env {
     db: KVNamespace
@@ -23,22 +21,22 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
     const tokensKeys = (await env.db.list({ prefix: "user:" })).keys;
 
     const users = groupBy(tokensKeys.map(key => {
-        const [_user, token, _event, slug] = key.name.split(":")
-        return [token, slug] as [string, string];
+        const [_user, slug, token] = key.name.split(":")
+        return [slug, token] as [string, string];
     })
-        .filter(([token, _slug]) => {
+        .filter(([_slug, token]) => {
             if (qtoken != null)
                 return token.includes(qtoken)
             return true;
         })
-        .filter(([_token, slug]) => {
+        .filter(([slug, _token]) => {
             if (qevent != null)
                 return slug.includes(qevent)
             return true;
         })
     );
 
-    const grouped = Object.entries(users).map(([token, events]) => ({ token, events }));
+    const grouped = Object.entries(users).map(([slug, tokens]) => ({ tokens, slug }));
 
     const response = renderFull(listUsers, { users: grouped, qtoken, qevent, title: "Admin users" });
     response.headers.set("HX-Push-Url", url.href);

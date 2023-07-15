@@ -32,7 +32,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, data, request, wa
 
     waitUntil(Promise.all([
         env.db.put(`events:${slug}`, secret, { metadata: { name } }),
-        env.db.put(`user:${user.token}:event:${slug}`, new Date().toISOString()),
+        env.db.put(`user:${slug}:${user.token}`, new Date().toISOString()),
     ]));
 
     const url = new URL(request.url);

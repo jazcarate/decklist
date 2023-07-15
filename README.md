@@ -12,7 +12,7 @@ KV:
 events:[slug] -> secret (metadata: name)
 event:[slug]:mail:[id] -> {date: number} (metadata: from, name, note?, reviewed: false)
 
-user:[token]:event:[slug] -> timestamp
+user:[slug]:[token] -> timestamp
 
 R2:
 event:[slug]:mail:[id]:[#]
