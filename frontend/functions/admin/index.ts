@@ -1,6 +1,6 @@
 import { renderFull } from "../render";
-import home from "../../templates/admin/home.html";
+import index from "../../templates/admin/index.html";
 
 export const onRequestGet: PagesFunction = async () => {
-    return renderFull(home);
+    return renderFull(index, { title: "Admin panel" });
 }

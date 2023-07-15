@@ -11,5 +11,5 @@ export const onRequestDelete: PagesFunction<Env> = async ({ env, params, data })
 
     console.log(`audit - ${user.token} :: Deleting user [${token}] permission for [${slug}]`);
     await env.db.delete(`user:${token}:event:${slug}`);
-    return new Response("", { status: 200, statusText: "Ok" });
+    return new Response("", { status: 204, statusText: "No Content" });
 }

@@ -1,6 +1,5 @@
 import { renderPartial } from "../../../../render";
 import mailContent from "../../../../../templates/events/mails/index.html";
-import content from "../../../../../templates/events/mails/content.html";
 
 interface Env {
     db: KVNamespace
@@ -21,5 +20,5 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env, params })
         return { link };
     });
 
-    return renderPartial(mailContent, view, { content });
+    return renderPartial(mailContent, view);
 }

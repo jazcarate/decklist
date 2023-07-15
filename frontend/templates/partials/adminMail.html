@@ -1,4 +1,5 @@
-<form hx-put="/admin/events/{{slug}}/mails/{{id}}" hx-encoding="multipart/form-data" hx-target="this">
+<form action="/admin/events/{{slug}}/mails/{{id}}" method="post" hx-encoding="multipart/form-data" hx-target="this"
+    hx-push-url="false">
     ({{id}})
 
     <label for="note">note</label>
@@ -11,7 +12,7 @@
     <input required name='name' value="{{name}}" /><br />
 
     <label for="reviewed">reviewed</label>
-    <input type="checkbox" name='reviewed' value="{{#reviewed}}true{{/reviewed}}{{^reviewed}}false{{/reviewed}}">
+    <input type="checkbox" name='reviewed' {{#reviewed}}checked{{/reviewed}}>
     <br />
 
     <input type="submit" />

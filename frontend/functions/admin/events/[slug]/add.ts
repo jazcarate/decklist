@@ -1,5 +1,5 @@
 import { renderPartial } from "../../../render";
-import mail from "../../../../templates/admin/events/details/mail.html"
+import adminMail from "../../../../templates/partials/adminMail.html";
 
 interface Env {
     db: KVNamespace,
@@ -37,5 +37,5 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, params, request }
         });
     }));
 
-    return renderPartial(mail, { ...mailData, slug, id });
+    return renderPartial(adminMail, { ...mailData, slug, id });
 }

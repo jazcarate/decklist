@@ -1,4 +1,4 @@
-import mail from "../../../../../templates/admin/events/details/mail.html";
+import mail from "../../../../../templates/partials/adminMail.html";
 import { renderPartial } from "../../../../render";
 
 interface Env {
@@ -23,7 +23,7 @@ export const onRequestDelete: PagesFunction<Env> = async ({ env, params }) => {
     return new Response("", { status: 200, statusText: "Ok" });
 }
 
-export const onRequestPut: PagesFunction<Env> = async ({ request, env, params }) => {
+export const onRequestPost: PagesFunction<Env> = async ({ request, env, params }) => {
     const slug = params.slug as string;
     const id = params.id as string;
 
@@ -46,6 +46,8 @@ export const onRequestPut: PagesFunction<Env> = async ({ request, env, params })
     }
 
     await env.db.put(key, oldMail.value, { metadata: newMail });
+
+    console.log({ newMail });
 
     return renderPartial(mail, { ...newMail, slug, id });
 }

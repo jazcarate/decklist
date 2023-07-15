@@ -2,7 +2,7 @@ import createEvent from "../../templates/events/create.html";
 import createdEvent from "../../templates/events/created.html";
 
 import { User } from "../auth";
-import { renderFull, renderPartial } from "../render";
+import { renderFull } from "../render";
 import generate from "../random-dictionary";
 
 interface Env {
@@ -21,11 +21,11 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, data, request, wa
     let user = data.user as User | null;
 
     if (!slug)
-        return renderPartial(createEvent, { ...view, validated: true });
+        return renderFull(createEvent, { ...view, validated: true });
 
     const existingEvent = await env.db.get(`events:${slug}`);
     if (existingEvent != null) {
-        return renderPartial(createEvent, { ...view, slugExists: true, validated: true });
+        return renderFull(createEvent, { ...view, slugExists: true, validated: true });
     }
 
     const secret = generate();
@@ -37,9 +37,9 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, data, request, wa
 
     const url = new URL(request.url);
     const manageLink = `${url.protocol}//${url.host}/e/${slug}/login?p=${secret}`;
-    return renderPartial(createdEvent, { ...view, manageLink, secret });
+    return renderFull(createdEvent, { ...view, manageLink, secret });
 }
 
 export const onRequestGet: PagesFunction<Env> = async () => {
-    return renderFull(createEvent);
+    return renderFull(createEvent, { title: "Create a new event" });
 }

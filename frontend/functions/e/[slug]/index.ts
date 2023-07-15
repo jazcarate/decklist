@@ -14,7 +14,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     const slug = params.slug as string;
 
     if (await isLoggedIn(context))
-        return renderFull(list, { title: `Login to ${slug}`, slug });
+        return renderFull(list, { title: slug, slug });
 
     return renderFull(login, { title: `Login to ${slug}`, slug });
 }

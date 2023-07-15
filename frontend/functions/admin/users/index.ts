@@ -21,21 +21,26 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
     const qevent = url.searchParams.get("qevent");
 
     const tokensKeys = (await env.db.list({ prefix: "user:" })).keys;
+
     const users = groupBy(tokensKeys.map(key => {
         const [_user, token, _event, slug] = key.name.split(":")
         return [token, slug] as [string, string];
-    }).filter(([token, slug]) => {
-        return (qtoken != null && token.includes(qtoken)) || (qevent != null && slug.includes(qevent));
-    }))
+    })
+        .filter(([token, _slug]) => {
+            if (qtoken != null)
+                return token.includes(qtoken)
+            return true;
+        })
+        .filter(([_token, slug]) => {
+            if (qevent != null)
+                return slug.includes(qevent)
+            return true;
+        })
+    );
+
     const grouped = Object.entries(users).map(([token, events]) => ({ token, events }));
 
-    const isHtmx = Boolean(request.headers.get("HX-Request"));
-    let response: Response;
-    if (isHtmx)
-        response = renderPartial(userResult, { users: grouped, qtoken, qevent }, { row });
-    else
-        response = renderFull(listUsers, { users: grouped, qtoken, qevent }, { row, users: userResult });
-
-    response.headers.set("HX-Replace-Url", url.href);
+    const response = renderFull(listUsers, { users: grouped, qtoken, qevent, title: "Admin users" });
+    response.headers.set("HX-Push-Url", url.href);
     return response;
 }

@@ -4,11 +4,11 @@
     href="/admin/users?qevent={{slug}}">Admin/Users</a>)
 
 <h2>Event</h2>
-{{> event}}
+{{> adminEvent}}
 
 <h2>Add attachment</h2>
-<form id="attachment-upload" hx-post="/admin/events/{{slug}}/add" hx-encoding="multipart/form-data" hx-target="#mails"
-    hx-swap="beforeend">
+<form hx-push-url="false" id="attachment-upload" action="/admin/events/{{slug}}/add" method="post"
+    hx-encoding="multipart/form-data" hx-target="#mails" hx-swap="beforeend">
     <label for="from">from</label>
     <input required name='from' value="{{from}}" /><br />
     <label for="subject">subject</label>
@@ -28,6 +28,6 @@
 
 <div id="mails">
     {{#mails}}
-    {{> mail}}
+    {{> adminMail}}
     {{/mails}}
 </div>

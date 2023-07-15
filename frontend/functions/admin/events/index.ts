@@ -1,7 +1,5 @@
 import { renderFull, renderPartial } from "../../render";
 import listEvents from "../../../templates/admin/events/index.html";
-import eventsResult from "../../../templates/admin/events/events.html";
-import row from "../../../templates/admin/events/eventRow.html";
 
 interface Env {
     db: KVNamespace
@@ -26,9 +24,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, request }) => {
         return name.includes(q) || slug.includes(q);
     });
 
-    if (q == null) {
-        return renderFull(listEvents, { events }, { row, events: eventsResult })
-    } else {
-        return renderPartial(eventsResult, { events }, { row })
-    }
+    let response = renderFull(listEvents, { q, events, title: `Admin events` });
+    response.headers.set("HX-Push-Url", url.href);
+    return response;
 }

@@ -6,7 +6,9 @@
             <li>
                 <a href="/e/{{.}}">{{.}}</a>
                 <a href="/admin/events/{{.}}">Admin</a>
-                <button hx-delete="/admin/users/{{token}}/events/{{.}}">
+                <button hx-delete="/admin/users/{{token}}/events/{{.}}"
+                    hx-confirm="Are you sure you want to logout {{token}} from {{.}}?" hx-target="closest li"
+                    hx-swap="outerHTML swap:0.3s">
                     Delete
                 </button>
             </li>

@@ -6,7 +6,7 @@
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <title>
         {{#title}}
-        Decklist.fun :: {{.}}
+        {{.}} :: Decklist.fun
         {{/title}}
         {{^title}}
         Decklist.fun
@@ -18,9 +18,16 @@
     <link rel="manifest" href="/site.webmanifest">
     <link rel="stylesheet" href="/main.css">
 </head>
+{{#dev}}
+<!-- 1.9.3 -->
+<script src="/htmx.js"></script>
+<script>htmx.logAll();</script>
+{{/dev}}
+{{^dev}}
 <script src="/htmx.min.js"></script>
+{{/dev}}
 
-<body>
+<body hx-boost="true" hx-push-url="true">
     <h1>Decklist.fun</h1>
     {{> inner}}
 </body>
