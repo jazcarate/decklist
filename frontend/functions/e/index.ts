@@ -29,12 +29,9 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, data, request, wa
     }
 
     const secret = generate();
-    const event = {
-        secret
-    };
 
     waitUntil(Promise.all([
-        env.db.put(`events:${slug}`, JSON.stringify(event), { metadata: { name } }),
+        env.db.put(`events:${slug}`, secret, { metadata: { name } }),
         env.db.put(`user:${user.token}:event:${slug}`, new Date().toISOString()),
     ]));
 
