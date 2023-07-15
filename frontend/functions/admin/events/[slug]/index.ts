@@ -120,5 +120,5 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, params }) => {
             id: mail.name.substring(prefix.length),
         }));
 
-    return renderFull(details, { mails, secret, name, slug });
+    return renderFull(details, { mails, secret, name, slug, title: `Admin ${slug}` });
 }
