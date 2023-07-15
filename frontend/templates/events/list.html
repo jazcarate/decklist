@@ -1,7 +1,7 @@
 <div id="app">
     <div class="spinner-container">
-        <div class="spinner" id="spinner" hx-get="/e/{{slug}}" hx-trigger="refreshInbox" hx-select="#inbox"
-            hx-target="#inbox" hx-on::after-request="resetRefresh()">
+        <div class="spinner" id="spinner" hx-get="/e/{{slug}}" hx-trigger="refreshInbox" hx-select="#app"
+            hx-target="#app" hx-on::after-request="resetRefresh()">
             Reload
         </div>
     </div>
