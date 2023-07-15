@@ -54,8 +54,10 @@
     document.addEventListener('touchmove', (event) => {
         const touch = event.touches[0];
         const deltaY = touch.clientY - startY;
+        const pageYOffset = window.pageYOffset || document.documentElement.scrollTop;
 
-        if (!refreshed && deltaY > 100) {
+
+        if (!refreshed && deltaY > 100 && pageYOffset < 10) {
             refreshed = true;
             event.preventDefault();
             spinner.parentElement.style.top = '0';
