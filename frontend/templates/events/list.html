@@ -1,74 +1,36 @@
-<div id="app">
-    <div class="spinner-container">
-        <div class="spinner" id="spinner" hx-get="/e/{{slug}}" hx-trigger="refreshInbox" hx-select="#app"
-            hx-target="#app" hx-on::after-request="resetRefresh()">
-            Reload
+<header>
+    <span class="title">{{slug}}@decklist.fun</span>
+</header>
+
+<form class="searchbar" action="/e/{{slug}}" method="get"
+    hx-trigger="keyup change from:input delay:500ms, submit, search" hx-select="#inbox" hx-target="#inbox"
+    hx-swap="outerHTML">
+    <input type="submit" value="🔎" alt="Search">
+    <input type="search" name="q" value="{{q}}" placeholder="Search">
+</form>
+
+<div id="inbox">
+    {{#mails}}
+    <div class="inbox-item" hx-on:click="select(this)">
+        <div class="selector"></div>
+        <div class="details">
+            <p class="name">{{name}}</p>
+            <p class="from">{{from}}</p>
+            <p class="note">{{note}}</p>
+        </div>
+        <div class="info">
+            <input disabled type="checkbox" name='reviewed' {{#reviewed}}checked{{/reviewed}} />
+            <a href="/e/{{slug}}/mail/{{id}}">></a>
         </div>
     </div>
-
-    <div class="screen screen1">
-        <header>
-            <span class="title">{{slug}}@decklist.fun</span>
-        </header>
-
-        <form class="searchbar" action="/e/{{slug}}" method="get"
-            hx-trigger="keyup change from:input delay:500ms, submit, search" hx-select="#inbox" hx-target="#inbox"
-            hx-swap="outerHTML">
-            <input type="submit" value="🔎" alt="Search">
-            <input type="search" name="q" value="{{q}}" placeholder="Search">
-        </form>
-
-        <div id="inbox">
-            {{#mails}}
-            <div class="inbox-item" hx-on:click="select(this)">
-                <div class="selector"></div>
-                <div class="details">
-                    <p class="name">{{name}}</p>
-                    <p class="from">{{from}}</p>
-                    <p class="note">{{note}}</p>
-                </div>
-                <div class="info">
-                    <input disabled type="checkbox" name='reviewed' {{#reviewed}}checked{{/reviewed}} />
-                    <a href="/e/{{slug}}/mail/{{id}}">></a>
-                </div>
-            </div>
-            {{/mails}}
-            {{^mails}}
-            No mails {{#q}}matchig <code>{{.}}</code>.{{/q}}{{^q}}. Share <code>{{slug}}@decklist.fun</code> with your
-            players{{/q}}
-            {{/mails}}
-        </div>
-    </div>
+    {{/mails}}
+    {{^mails}}
+    No mails {{#q}}matchig <code>{{.}}</code>.{{/q}}{{^q}}. Share <code>{{slug}}@decklist.fun</code> with your
+    players{{/q}}
+    {{/mails}}
 </div>
 
 <script>
-    const spinner = document.getElementById('spinner');
-    let startY = 0;
-    let refreshed = false;
-
-    document.addEventListener('touchstart', (event) => {
-        const touch = event.touches[0];
-        startY = touch.clientY;
-    });
-
-    document.addEventListener('touchmove', (event) => {
-        const touch = event.touches[0];
-        const deltaY = touch.clientY - startY;
-        const pageYOffset = window.pageYOffset || document.documentElement.scrollTop;
-
-
-        if (!refreshed && deltaY > 100 && pageYOffset < 10) {
-            refreshed = true;
-            event.preventDefault();
-            spinner.parentElement.style.top = '0';
-            spinner.dispatchEvent(new Event('refreshInbox'));
-        }
-    });
-
-    function resetRefresh() {
-        refreshed = false
-        spinner.parentElement.style.top = '-100px';
-    };
 
     function select(elem) {
         htmx.findAll(".inbox-item.selected").forEach(element => {
