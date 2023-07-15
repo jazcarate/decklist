@@ -19,7 +19,8 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env, params })
         const idx = obj.key.substring(prefix.length);
         const link = `${url.protocol}//${url.host}/e/${slug}/mail/${mail}/${idx}`;
         const type = obj.httpMetadata?.contentType;
-        return { link, type };
+        const name = obj.httpMetadata?.contentDisposition?.match(/filename="(\w+)/)[1] ?? 'inline';
+        return { name, link, type };
     });
 
     return renderPartial(mailContent, view, { content });
