@@ -134,6 +134,7 @@ header .title {
     flex: 1;
     outline: 0;
     border: 0;
+    background: transparent;
 }
 
 .searchbar:focus-within {
@@ -166,7 +167,10 @@ header .title {
 .inbox-item .details {
     flex-grow: 1;
     min-width: 0;
-    padding: 10px 0;
+    height: 83px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .inbox-item .details p {

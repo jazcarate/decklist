@@ -65,7 +65,8 @@ export default {
 		}
 
 		const id = randId();
-		const from = message.from;
+		const from = email.from.address;
+		const name = email.from.name;
 		const note = email.subject;
 		const date = Date.now();
 

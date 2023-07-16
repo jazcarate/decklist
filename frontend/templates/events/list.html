@@ -14,8 +14,13 @@
     <div class="inbox-item" hx-on:click="select(this)">
         <div class="selector"></div>
         <div class="details">
-            <p class="name">{{name}}</p>
+            {{#name}}
+            <p class="name">{{.}}</p>
             <p class="from">{{from}}</p>
+            {{/name}}
+            {{^name}}
+            <p class="name">{{from}}</p>
+            {{/name}}
             <p class="note">{{note}}</p>
         </div>
         <div class="info">
