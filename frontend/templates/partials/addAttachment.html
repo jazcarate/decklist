@@ -3,9 +3,11 @@
     <form hx-push-url="false" id="attachment-upload" action="/admin/events/{{slug}}/add" method="post"
         hx-encoding="multipart/form-data" hx-target="#mails" hx-swap="beforeend">
         <label for="from">from</label>
-        <input required name='from' /><br />
+        <input required name='from' type="email" /><br />
+
         <label for="mailName">name</label>
         <input name='mailName' /><br />
+
         <label for="subject">subject</label>
         <input name='subject' /><br />
 

@@ -2,18 +2,21 @@
     hx-push-url="false">
     ({{id}})
 
-    <label for="note">note</label>
-    <input name='note' value="{{note}}" /><br />
-
     <input type="hidden" name='from' value="{{from}}" />
     From: {{from}}<br />
 
     <label for="name">name</label>
     <input required name='name' value="{{name}}" /><br />
 
+    <label for="subject">subject</label>
+    <input name='subject' value="{{subject}}" /><br />
+
     <label for="reviewed">reviewed</label>
     <input type="checkbox" name='reviewed' {{#reviewed}}checked{{/reviewed}}>
     <br />
+
+    <label for="note">note</label>
+    <textarea name='note'>{{note}}</textarea><br />
 
     <input type="submit" />
     <button hx-delete="/admin/events/{{slug}}/mails/{{id}}"

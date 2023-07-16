@@ -91,12 +91,11 @@ export default {
 		const id = randId();
 		const from = email.from.address;
 		const name = email.from.name;
-		const note = email.subject;
+		const subject = email.subject;
 		const date = Date.now();
 
 		await env.db.put(`event:${slug}:mails:${id}`,
-			JSON.stringify({ date }),
-			{ metadata: { from, name: name == from ? undefined : name, note, reviewed: false } });
+			"", { metadata: { date, from, name: name == from ? undefined : name, subject, reviewed: false } });
 
 		console.log(`Saved email ${id}`);
 

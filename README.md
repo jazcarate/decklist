@@ -10,7 +10,7 @@ To make yourself an admin, go to <http://127.0.0.1:8788/makeAdmin> and use `123`
 
 KV:
 events:[slug] -> secret (metadata: name)
-event:[slug]:mails:[id] -> {date: number} (metadata: from, name, note?, reviewed: false)
+event:[slug]:mails:[id] -> void (metadata: from, name, subject, note?, date(number), reviewed: false)
 
 user:[slug]:[token] -> timestamp
 

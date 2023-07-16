@@ -13,7 +13,7 @@ export const onRequestDelete: PagesFunction<Env> = async ({ env, params }) => {
     const key = `event:${slug}:mails:${id}`;
     await env.db.delete(key);
 
-    const content = await env.content.list({ prefix: `event:${slug}:mails:${id}:attachments:` });
+    const content = await env.content.list({ prefix: `event:${slug}:mail:${id}:attachments:` });
     for (const mail of content.objects) {
         await env.content.delete(mail.key);
     }
@@ -29,6 +29,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env, params }
 
     const form = await request.formData();
     const from = form.get("from");
+    const subject = form.get("subject");
     const name = form.get("name");
     const note = form.get("note");
     const reviewed = Boolean(form.get("reviewed"));
@@ -36,11 +37,18 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env, params }
     const key = `event:${slug}:mails:${id}`;
     const oldMail = await env.db.getWithMetadata(key);
 
-    const { from: oldFrom, name: oldName, note: oldNote, reviewed: oldReviewed } = oldMail.metadata as any;
+    const {
+        from: oldFrom,
+        subject: oldSubject,
+        name: oldName,
+        note: oldNote,
+        reviewed: oldReviewed
+    } = oldMail.metadata as any;
 
     const newMail = {
         note: note ?? oldNote,
         from: from ?? oldFrom,
+        subject: subject ?? oldSubject,
         name: name ?? oldName,
         reviewed: reviewed ?? oldReviewed
     }

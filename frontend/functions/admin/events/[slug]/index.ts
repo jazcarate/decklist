@@ -17,8 +17,7 @@ interface MailMetadata {
 export const onRequestDelete: PagesFunction<Env> = async ({ env, params }) => {
     const slug = params.slug as string;
 
-    const prefix = `event:${slug}:mails:`;
-    const mails = await env.db.list({ prefix });
+    const mails = await env.db.list({ prefix: `event:${slug}:mails:` });
 
     await env.db.delete(`events:${slug}`)
 
@@ -26,8 +25,7 @@ export const onRequestDelete: PagesFunction<Env> = async ({ env, params }) => {
         await env.db.delete(mail.name);
     }
 
-    const attachmentPrefix = `event:${slug}:mail:`;
-    const mailsContents = await env.content.list({ prefix });
+    const mailsContents = await env.content.list({ prefix: `event:${slug}:mail:` });
     for (const obj of mailsContents.objects) {
         await env.content.delete(obj.key)
     }
@@ -118,6 +116,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, params }) => {
     const { name } = dbEvent.metadata;
     const prefix = `event:${slug}:mails:`;
     const mails = (await env.db.list<any>({ prefix })).keys
+        .sort(mail => mail.metadata.date)
         .map(mail => ({
             ...mail.metadata,
             id: mail.name.substring(prefix.length),

@@ -205,6 +205,11 @@ header .sub {
 }
 
 .inbox-item .details .from {
+    font-weight: normal;
+    font-size: small;
+}
+
+.inbox-item .details .subject {
     color: #888;
 }
 

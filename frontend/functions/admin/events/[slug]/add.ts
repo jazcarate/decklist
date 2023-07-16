@@ -21,13 +21,12 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, params, request }
     const id = randId();
     const from = form.get("from");
     const name = form.get("mailName");
-    const note = form.get("subject");
+    const subject = form.get("subject");
     const date = Date.now();
-    const mailData = { from, name, note, reviewed: false };
+    const metadata = { from, name, subject, reviewed: false, date };
 
     await env.db.put(`event:${slug}:mails:${id}`,
-        JSON.stringify({ date }),
-        { metadata: mailData });
+        "", { metadata });
 
     const bodyKey = `event:${slug}:mail:${id}:attachments:`;
     const attachments = form.getAll("attachments") as unknown as File[];
@@ -39,5 +38,5 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, params, request }
         });
     }));
 
-    return renderPartial(addAttachment + adminMail, { from, name, note, slug, id });
+    return renderPartial(addAttachment + adminMail, { from, name, subject, slug, id });
 }
