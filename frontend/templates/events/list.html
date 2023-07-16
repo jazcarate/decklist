@@ -10,7 +10,7 @@
     <form id="search" hx-push-url=true class="searchbar" action="/e/{{slug}}" method="get"
         hx-trigger="keyup change from:input delay:500ms, submit, search">
         <input type="submit" value="🔎" alt="Search">
-        <input type="search" name="q" value="{{q}}" placeholder="Search">
+        <input id="iNeedAnIdToSmartSwap" type="search" name="q" value="{{q}}" placeholder="Search">
     </form>
 
     <div id="inbox">
