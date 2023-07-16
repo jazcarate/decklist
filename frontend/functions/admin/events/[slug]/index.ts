@@ -17,7 +17,7 @@ interface MailMetadata {
 export const onRequestDelete: PagesFunction<Env> = async ({ env, params }) => {
     const slug = params.slug as string;
 
-    const prefix = `event:${slug}:mail:`;
+    const prefix = `event:${slug}:mails:`;
     const mails = await env.db.list({ prefix });
 
     await env.db.delete(`events:${slug}`)
@@ -26,6 +26,7 @@ export const onRequestDelete: PagesFunction<Env> = async ({ env, params }) => {
         await env.db.delete(mail.name);
     }
 
+    const attachmentPrefix = `event:${slug}:mail:`;
     const mailsContents = await env.content.list({ prefix });
     for (const obj of mailsContents.objects) {
         await env.content.delete(obj.key)
@@ -50,12 +51,12 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, params, request }
     let name = newName ?? oldDbEvent.metadata.name;
     const secret = newSecret ?? oldDbEvent.value;
 
-    const prefix = `event:${slug}:mail:`;
-    const dbMails = await env.db.list<MailMetadata>({ prefix })
+    const mailsPrefix = `event:${slug}:mails:`;
+    const dbMails = await env.db.list<MailMetadata>({ prefix: mailsPrefix })
     let mails = dbMails.keys
         .map(mail => ({
             ...mail.metadata,
-            id: mail.name.substring(prefix.length),
+            id: mail.name.substring(mailsPrefix.length),
         }));
 
     if (slug !== newSlug) {
@@ -63,21 +64,19 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, params, request }
         console.log(`Migration ${slug} to ${newSlug}`);
         await env.db.delete(oldEventKey);
         for (const mail of dbMails.keys) {
-            const key = mail.name.substring(prefix.length);
-            const newPrefix = `event:${newSlug}:mail:${key}`;
+            const newMailKey = mail.name.replace(slug, newSlug);
 
             const oldMail = await env.db.getWithMetadata(mail.name);
-            await env.db.delete(key);
-            await env.db.put(newPrefix, oldMail.value, { metadata: oldMail.metadata });
+            await env.db.delete(mail.name);
+            await env.db.put(newMailKey, oldMail.value, { metadata: oldMail.metadata });
 
-            console.log(` - Mail ${key}`);
+            console.log(` - Mail ${newMailKey}`);
 
-            const objects = (await env.content.list({ prefix })).objects;
+            const attachmentPrefix = `event:${slug}:mails:`;
+            const objects = (await env.content.list({ prefix: attachmentPrefix })).objects;
             for (const objRef of objects) {
-                console.debug({ prefix, key: objRef.key, newSlug });
-
                 const obj = await env.content.get(objRef.key);
-                const newObjKey = obj.key.substring(newPrefix.length + 1) // 1 -> ":"
+                const newObjKey = obj.key.replace(slug, newSlug);
                 await env.content.put(newObjKey, await obj.arrayBuffer(), { ...obj });
                 await env.content.delete(objRef.key);
 
@@ -87,11 +86,12 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, params, request }
             const userPrefix = `user:${slug}:`;
             const users = await env.db.list({ prefix: userPrefix });
             for (const user of users.keys) {
+                const newUserKey = user.name.replace(slug, newSlug);
                 const oldUser = await env.db.get(user.name);
                 await env.db.delete(user.name);
-                await env.db.put(user.name.replace(slug, newSlug), oldUser);
+                await env.db.put(newUserKey, oldUser);
 
-                console.log(` - User ${user.name.substring(userPrefix.length)}`);
+                console.log(` - User ${newUserKey}`);
             }
         }
     }

@@ -6,7 +6,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env, params })
     const mail = params.mail as string;
     const idx = params.idx as string;
 
-    const object = await env.content.get(`event:${slug}:mail:${mail}:${idx}`);
+    const object = await env.content.get(`event:${slug}:mail:${mail}:attachments:${idx}`);
     if (!object) {
         return new Response("Not Found", { status: 404, statusText: "Not Found" });
     }

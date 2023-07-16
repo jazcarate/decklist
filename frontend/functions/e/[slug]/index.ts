@@ -21,7 +21,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, params, env })
     const slug = params.slug as string;
     const q = url.searchParams.get("q");
 
-    const prefix = `event:${slug}:mail:`;
+    const prefix = `event:${slug}:mails:`;
     const event = await env.db.getWithMetadata<EventMetadata>(`events:${slug}`);
     const mails = (await env.db.list<MailMetadata>({ prefix })).keys
         .map(mail => {

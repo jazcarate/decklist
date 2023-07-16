@@ -24,11 +24,11 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, params, request }
     const date = Date.now();
     const mailData = { from, name: name ?? from, note, reviewed: false };
 
-    await env.db.put(`event:${slug}:mail:${id}`,
+    await env.db.put(`event:${slug}:mails:${id}`,
         JSON.stringify({ date }),
         { metadata: mailData });
 
-    const bodyKey = `event:${slug}:mail:${id}:`;
+    const bodyKey = `event:${slug}:mail:${id}:attachments:`;
     const attachments = form.getAll("attachments") as unknown as File[];
     await Promise.all(attachments.map(async (attachment, idx) => {
         await env.content.put(bodyKey + String(idx + 1), await attachment.arrayBuffer(), {

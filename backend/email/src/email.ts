@@ -57,7 +57,31 @@ export default {
 			reply.setSubject(email.subject ?? "Problem submitting the decklist");
 			reply.addMessage({
 				contentType: 'text/plain',
-				data: `Sorry!\nWe didn't find the event "${message.to}". Check with your tournament officials.`
+				data: `Sorry!\nWe didn't find the event "${slug}" at ${message.to}. Check with your tournament officials.`
+			});
+
+			await env.email.send(new EmailMessage(message.to, message.from, reply.asRaw()));
+			return;
+		}
+
+		if (email.attachments.length == 0 && !email.text) {
+			console.log(`Discarding email from '${message.from}'. Empty email`);
+
+			const reply = createMimeMessage();
+			reply.setSender({
+				name: "Don't Reply", addr: message.to
+			});
+			const originalID = message.headers.get("Message-ID");
+			if (originalID) {
+				reply.setHeader("In-Reply-To", originalID);
+				reply.setHeader("References", originalID);
+			}
+			reply.setHeader("Auto-Submitted", "auto-replied");
+			reply.setRecipient(message.from);
+			reply.setSubject(email.subject ?? "Problem submitting the decklist");
+			reply.addMessage({
+				contentType: 'text/plain',
+				data: `It appears you didn't send any decklist!\nPlease attach your decklist and try againl.`
 			});
 
 			await env.email.send(new EmailMessage(message.to, message.from, reply.asRaw()));
@@ -70,13 +94,13 @@ export default {
 		const note = email.subject;
 		const date = Date.now();
 
-		await env.db.put(`event:${slug}:mail:${id}`,
+		await env.db.put(`event:${slug}:mails:${id}`,
 			JSON.stringify({ date }),
 			{ metadata: { from, name: from, note, reviewed: false } });
 
 		console.log(`Saved email ${id}`);
 
-		const bodyKey = `event:${slug}:mail:${id}:`;
+		const bodyKey = `event:${slug}:mail:attachments:${id}:`;
 		await env.content.put(bodyKey + "0", `${email.subject}\n\n${email.text}`, {
 			httpMetadata: {
 				contentType: "text/plain", contentDisposition: `inline; filename="body.txt"`
