@@ -20,5 +20,5 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env, params })
         return { link };
     });
 
-    return renderPartial(mailTemplate, { attachments });
+    return renderPartial(mailTemplate, { attachments, slug });
 }
