@@ -222,14 +222,13 @@ header .sub {
     flex-shrink: 0;
     display: flex;
     align-items: center;
-}
-
-.inbox-item .info {
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
     column-gap: 10px;
     padding-right: 7px;
+}
+
+.inbox-item .info .date {
+    color: #aaa;
+    font-size: smaller;
 }
 
 .inbox-item .info .goto {
