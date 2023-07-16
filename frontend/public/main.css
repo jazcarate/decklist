@@ -99,6 +99,12 @@ li {
     padding: 0;
 }
 
+#container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
 header {
     font-family: 'Anaheim', sans-serif;
     background: var(--main-color);
@@ -111,6 +117,11 @@ header {
 header .title {
     font-size: 30px;
     color: var(--off-color);
+}
+
+header .sub {
+    font-size: 15px;
+    color: var(--secondary-color);
 }
 
 .searchbar {
@@ -139,6 +150,15 @@ header .title {
 
 .searchbar:focus-within {
     border-bottom-color: var(--secondary-color);
+}
+
+#inbox {
+    flex-grow: 1;
+}
+
+#inbox a {
+    text-decoration: none;
+    color: inherit;
 }
 
 .inbox-item {
@@ -207,7 +227,19 @@ header .title {
     padding-right: 7px;
 }
 
-.inbox-item .info a {
+.inbox-item .info .goto {
     text-decoration: none;
     font-size: 50px;
+}
+
+.share {
+    background-color: var(--off-color);
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+.copy {
+    cursor: pointer;
+    font-size: 0.8em;
 }

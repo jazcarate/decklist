@@ -2,7 +2,7 @@
 <br />
 
 <form action="/admin/events" method="get" hx-trigger="keyup change from:input delay:500ms, submit, search"
-    hx-select="#search-results" hx-target="#search-results" hx-swap="outerHTML">
+    hx-swap="outerHTML">
     <input type="search" name="q" value="{{q}}" placeholder="Search events...">
     <input type="submit">
 </form>

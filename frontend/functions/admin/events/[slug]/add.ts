@@ -19,9 +19,10 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, params, request }
     // TODO: Duplicated from Email worker
     const id = randId();
     const from = form.get("from");
+    const name = form.get("name");
     const note = form.get("subject");
     const date = Date.now();
-    const mailData = { from, name: from, note, reviewed: false };
+    const mailData = { from, name: name ?? from, note, reviewed: false };
 
     await env.db.put(`event:${slug}:mail:${id}`,
         JSON.stringify({ date }),

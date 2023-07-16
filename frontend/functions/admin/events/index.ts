@@ -21,10 +21,8 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, request }) => {
         slug: event.name.substring(prefix.length)
     })).filter(({ name, slug }) => {
         if (q == null) return true;
-        return name.includes(q) || slug.includes(q);
+        return name?.toLowerCase()?.includes(q) || slug?.toLowerCase()?.includes(q);
     });
 
-    let response = renderFull(listEvents, { q, events, title: `Admin events` });
-    response.headers.set("HX-Push-Url", url.href);
-    return response;
+    return renderFull(listEvents, { q, events, title: `Admin events` });
 }

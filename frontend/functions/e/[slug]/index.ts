@@ -5,7 +5,11 @@ interface Env {
     db: KVNamespace,
 }
 
-interface Metadata {
+interface EventMetadata {
+    name?: string
+}
+
+interface MailMetadata {
     from: string;
     name: string;
     note?: string;
@@ -18,18 +22,20 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, params, env })
     const q = url.searchParams.get("q");
 
     const prefix = `event:${slug}:mail:`;
-    const mails = (await env.db.list<Metadata>({ prefix })).keys
+    const event = await env.db.getWithMetadata<EventMetadata>(`events:${slug}`);
+    const mails = (await env.db.list<MailMetadata>({ prefix })).keys
         .map(mail => {
             const { from, name, note, reviewed } = mail.metadata;
             const id = mail.name.substring(prefix.length);
             return { from, name, note, reviewed, id };
         })
         .filter(({ from, name, note }) => {
+            console.log({ from, name, note, q });
             if (q == null) return true;
-            return from?.includes(q) || name.includes(q) || note?.includes(q)
+            return from?.toLowerCase()?.includes(q) ||
+                name?.toLowerCase()?.includes(q) ||
+                note?.toLowerCase()?.includes(q)
         });
 
-    const response = renderFull(list, { title: slug, slug, mails, q });
-    response.headers.set("HX-Push-Url", url.href);
-    return response
+    return renderFull(list, { title: slug, slug, name: event.metadata.name, secret: event.value, mails, q });
 }
