@@ -111,9 +111,12 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, params }) => {
     const slug = params.slug as string;
 
     const dbEvent = await env.db.getWithMetadata<EventMetadata>(`events:${slug}`);
+    if (!dbEvent.value)
+        return new Response(`No event ${slug}`, { status: 404, statusText: "Not Found" });
+
     const secret = dbEvent.value;
     const { name } = dbEvent.metadata;
-    const prefix = `event:${slug}:mail:`;
+    const prefix = `event:${slug}:mails:`;
     const mails = (await env.db.list<any>({ prefix })).keys
         .map(mail => ({
             ...mail.metadata,

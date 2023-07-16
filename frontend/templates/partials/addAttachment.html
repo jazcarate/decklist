@@ -1,0 +1,26 @@
+<div id="addAttachment" hx-swap-oob="true">
+    <h2>Add attachment</h2>
+    <form hx-push-url="false" id="attachment-upload" action="/admin/events/{{slug}}/add" method="post"
+        hx-encoding="multipart/form-data" hx-target="#mails" hx-swap="beforeend">
+        <label for="from">from</label>
+        <input required name='from' /><br />
+        <label for="mailName">name</label>
+        <input name='mailName' /><br />
+        <label for="subject">subject</label>
+        <input name='subject' /><br />
+
+        <label for="attachments">attachments</label>
+        <input type="file" multiple name="attachments" /><br />
+
+        <input type="submit" />
+        <progress id='upload-progress' value='0' max='100'></progress>
+    </form>
+    <script>
+        htmx.on('#attachment-upload', 'htmx:xhr:progress', function (evt) {
+            htmx.find('#upload-progress').setAttribute('value', evt.detail.loaded / evt.detail.total * 100);
+        });
+        htmx.on('#attachment-upload', 'htmx:xhr:loadend', function (evt) {
+            htmx.find('#upload-progress').setAttribute('value', 0);
+        });
+    </script>
+</div>

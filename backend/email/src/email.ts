@@ -96,7 +96,7 @@ export default {
 
 		await env.db.put(`event:${slug}:mails:${id}`,
 			JSON.stringify({ date }),
-			{ metadata: { from, name: from, note, reviewed: false } });
+			{ metadata: { from, name: name == from ? undefined : name, note, reviewed: false } });
 
 		console.log(`Saved email ${id}`);
 

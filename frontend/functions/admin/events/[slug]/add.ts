@@ -1,5 +1,6 @@
 import { renderPartial } from "../../../render";
 import adminMail from "../../../../templates/partials/adminMail.html";
+import addAttachment from "../../../../templates/partials/addAttachment.html";
 
 interface Env {
     db: KVNamespace,
@@ -19,10 +20,10 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, params, request }
     // TODO: Duplicated from Email worker
     const id = randId();
     const from = form.get("from");
-    const name = form.get("name");
+    const name = form.get("mailName");
     const note = form.get("subject");
     const date = Date.now();
-    const mailData = { from, name: name ?? from, note, reviewed: false };
+    const mailData = { from, name, note, reviewed: false };
 
     await env.db.put(`event:${slug}:mails:${id}`,
         JSON.stringify({ date }),
@@ -38,5 +39,5 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, params, request }
         });
     }));
 
-    return renderPartial(adminMail, { ...mailData, slug, id });
+    return renderPartial(addAttachment + adminMail, { from, name, note, slug, id });
 }
