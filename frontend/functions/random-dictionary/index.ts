@@ -1,12 +1,13 @@
-import adjectives from "./adjectives";
-import colors from "./colors";
 import animals from "./animals";
 
 export default function generate(): string {
-    return `${rnd(adjectives)}-${rnd(colors)}-${rnd(animals)}`
+    return `${rndFrom(animals)}-${rndNum()}`
 }
 
-function rnd<T>(xs: T[]): T {
+function rndNum(): number {
+    return Math.floor(Math.random() * 100);
+}
+function rndFrom<T>(xs: T[]): T {
     const i = Math.floor(Math.random() * xs.length);
     return xs[i];
 }
