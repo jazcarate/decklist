@@ -4,8 +4,7 @@
     href="/admin/users?qevent={{slug}}">Admin/Users</a>)
 
 <h2>Event</h2>
-<form id="adminEvent" action="/admin/events/{{slug}}" method="post" hx-select="#adminEvent" hx-target="this"
-    hx-swap="outerHTML">
+<form id="adminEvent" action="/admin/events/{{slug}}" method="post">
     <hr />
     <label for="slug">slug</label>
     <input required name='slug' value="{{slug}}" /><br />

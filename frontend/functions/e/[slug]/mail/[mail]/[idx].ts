@@ -12,7 +12,8 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env, params })
     }
 
     const headers = new Headers();
-    headers.set('etag', object.httpEtag);
+    headers.set("ETag", object.httpEtag);
+    headers.set("Content-Security-Policy", "sandbox;");
 
     if (object.httpMetadata?.contentDisposition)
         headers.set("Content-Disposition", object.httpMetadata?.contentDisposition);

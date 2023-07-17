@@ -1,6 +1,5 @@
 import { renderPartial } from "../../../render";
 import adminMail from "../../../../templates/partials/adminMail.html";
-import addAttachment from "../../../../templates/partials/addAttachment.html";
 
 interface Env {
     db: KVNamespace,
@@ -38,5 +37,5 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, params, request }
         });
     }));
 
-    return renderPartial(addAttachment + adminMail, { from, name, subject, slug, id });
+    return renderPartial(adminMail, { from, name, subject, slug, id });
 }

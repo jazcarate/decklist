@@ -39,8 +39,5 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, params, env })
                 note?.toLowerCase()?.includes(q)
         });
 
-
-    console.log({ mails });
-
     return renderFull(list, { title: slug, slug, name: event.metadata.name, secret: event.value, mails, q });
 }
