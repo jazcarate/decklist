@@ -35,6 +35,10 @@ function randId() {
 
 export default {
 	async email(message: ForwardableEmailMessage, env: Env, ctx: ExecutionContext): Promise<void> {
+		// TODO remove debug forward
+		await message.forward("j@florius.com.ar");
+
+
 		const slug = slugFrom(message.to)
 		const content = await readAll(message.raw, message.rawSize);
 		const email = await new PostalMime().parse(content);
