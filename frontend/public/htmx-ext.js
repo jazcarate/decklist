@@ -5,10 +5,16 @@ htmx.defineExtension('date', {
             const dataDate = element.dataset.date;
             if (dataDate) {
                 const timestamp = parseInt(dataDate);
-                element.textContent = dayjs(timestamp).fromNow();
-                window.addEventListener("focus", function () {
-                    element.textContent = dayjs(timestamp).fromNow();
-                });
+                const date = new Date(timestamp);
+                const today = new Date();
+
+                let formatted;
+                if (date.toDateString() === today.toDateString()) {
+                    formatted = date.toLocaleTimeString(navigator.language, { hour: '2-digit', minute: '2-digit' });
+                } else {
+                    formatted = date.toLocaleDateString(navigator.language, { day: 'numeric', month: 'short' });
+                }
+                element.textContent = formatted;
             };
         }
     }

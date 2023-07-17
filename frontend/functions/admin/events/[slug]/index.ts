@@ -116,7 +116,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, params }) => {
     const { name } = dbEvent.metadata;
     const prefix = `event:${slug}:mails:`;
     const mails = (await env.db.list<any>({ prefix })).keys
-        .sort(mail => mail.metadata.date)
+        .sort((mail1, mail2) => (mail2.metadata.date ?? 0) - (mail1.metadata.date ?? 0))
         .map(mail => ({
             ...mail.metadata,
             id: mail.name.substring(prefix.length),
