@@ -1,6 +1,5 @@
 interface Env {
 	API_TOKEN: string,
-	ACCOUNT_ID: string
 }
 
 interface Analytics {
@@ -30,7 +29,7 @@ export default {
 			WHERE timestamp > NOW() - INTERVAL '${span}' DAY
 			GROUP BY index1, blob1`;
 
-		const API = `https://api.cloudflare.com/client/v4/accounts/${env.ACCOUNT_ID}/analytics_engine/sql`;
+		const API = `https://api.cloudflare.com/client/v4/accounts/f5396e3735b54465f00ce7a9f315f0ae/analytics_engine/sql`;
 		const queryResponse = await fetch(API, {
 			method: 'POST',
 			headers: {
