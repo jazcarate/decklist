@@ -25,7 +25,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
 				SUM(_sample_interval) AS n_readings
 			FROM emailMetrics
 			WHERE timestamp > NOW() - INTERVAL '${span}' DAY
-			GROUP BY index1, blob1`;
+        GROUP BY index1, blob1`;
 
     const API = `https://api.cloudflare.com/client/v4/accounts/f5396e3735b54465f00ce7a9f315f0ae/analytics_engine/sql`;
     const queryResponse = await fetch(API, {

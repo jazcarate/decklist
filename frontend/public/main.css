@@ -10,15 +10,36 @@
     box-shadow: 0 0 3px #CC0000;
 }
 
+#toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #f44336;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
 #progress {
     position: fixed;
     top: 0;
     z-index: 1000;
-    height: 4px;
+    height: 3px;
+    background-color: white;
     width: 100%;
     border-radius: 2px;
     background-clip: padding-box;
     overflow: hidden;
+    display: none;
+}
+
+#progress .indeterminate {
+    background-color: var(--secondary-color);
 }
 
 #progress .indeterminate:before {
@@ -45,10 +66,6 @@
     animation: indeterminate-short 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) infinite;
     -webkit-animation-delay: 1.15s;
     animation-delay: 1.15s;
-}
-
-#progress {
-    display: none;
 }
 
 #progress.htmx-request {

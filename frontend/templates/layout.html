@@ -31,10 +31,21 @@
 <script src="/htmx-ext.js"></script>
 
 <body hx-boost="true" hx-push-url="true" hx-target="this" hx-indicator="#progress">
-    <div id="progress" style="height: 3px; background-color: white;">
-        <div class="indeterminate" style="background-color: red;"></div>
+    <div id="toast" style="display: none;"></div>
+    <div id="progress">
+        <div class="indeterminate"></div>
     </div>
     {{> inner}}
 </body>
+<script>
+    htmx.on('htmx:error', function (event) {
+        const toast = document.getElementById('toast');
+        toast.textContent = 'Error: ' + event.detail.errorInfo.error;
+        toast.style.display = 'block';
+        setTimeout(function () {
+            toast.style.display = 'none';
+        }, 3000);
+    });
+</script>
 
 </html>
