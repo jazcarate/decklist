@@ -1,3 +1,0 @@
-name = "analytics"
-main = "src/analytics.ts"
-compatibility_date = "2023-07-17"
