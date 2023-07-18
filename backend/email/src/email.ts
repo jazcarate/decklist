@@ -107,7 +107,7 @@ export default {
 
 			console.log(`Saved email ${id}`);
 
-			const bodyKey = `event:${slug}:mail:attachments:${id}:`;
+			const bodyKey = `event:${slug}:mail:${id}:attachments:`;
 			await env.content.put(bodyKey + "0", `${email.subject}\n\n${email.text}`, {
 				httpMetadata: {
 					contentType: "text/plain", contentDisposition: `inline; filename="body.txt"`
