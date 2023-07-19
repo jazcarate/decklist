@@ -30,11 +30,13 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, params, request }
     const bodyKey = `event:${slug}:mail:${id}:attachments:`;
     const attachments = form.getAll("attachments") as unknown as File[];
     await Promise.all(attachments.map(async (attachment, idx) => {
-        await env.content.put(bodyKey + String(idx + 1), await attachment.arrayBuffer(), {
+        const key = bodyKey + String(idx + 1);
+        await env.content.put(key, await attachment.arrayBuffer(), {
             httpMetadata: {
                 contentType: attachment.type, contentDisposition: `inline; filename="${attachment.name}"`
             }
         });
+        await env.db.put(key, "", { metadata: { ok: true } });
     }));
 
     return renderPartial(adminMail, { from, name, subject, slug, id });

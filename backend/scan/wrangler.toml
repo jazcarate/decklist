@@ -1,0 +1,15 @@
+name = "scan"
+main = "src/scan.ts"
+compatibility_date = "2023-05-15"
+
+kv_namespaces = [
+    { binding = "db", id = "f68f7a8b3b9e4c60aa8368023eac658a" }
+]
+
+r2_buckets = [
+    { binding = "content", bucket_name = "emails-content" } 
+]
+
+# every hour
+[triggers]
+crons = ["0 * * * *"]

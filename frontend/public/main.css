@@ -131,6 +131,7 @@ li {
     background-size: 200px;
     background-repeat: repeat;
     animation: scrollBackground 20s linear infinite;
+    padding: 0 20px;
 }
 
 @keyframes scrollBackground {

@@ -7,6 +7,7 @@ interface Env {
 	content: R2Bucket,
 	email: SendEmail,
 	emailMetrics: AnalyticsEngineDataset
+	VIRUS_TOTAL_API_KEY: string
 }
 
 async function readAll(stream: ReadableStream, size: number): Promise<Uint8Array> {
@@ -116,12 +117,29 @@ export default {
 			console.log(`Saved attachment '0'`);
 
 			await Promise.all(email.attachments.map(async (attachment, idx) => {
-				const obj = await env.content.put(bodyKey + String(idx + 1), attachment.content, {
+				const key = bodyKey + String(idx + 1);
+				const obj = await env.content.put(key, attachment.content, {
 					httpMetadata: {
 						contentType: attachment.mimeType, contentDisposition: `inline; filename="${attachment.filename}"`
 					}
 				});
 				console.log(`Saved attachment '${idx + 1}' ${obj.size}bytes`);
+
+				const body = new FormData();
+				body.set("file", new Blob([attachment.content], { type: attachment.mimeType }), attachment.filename);
+				const headers = new Headers([
+					["Accept", "application/json"],
+					["x-apikey", env.VIRUS_TOTAL_API_KEY]]);
+				const response = await fetch("https://www.virustotal.com/api/v3/files", {
+					headers, body
+				});
+				if (response.status != 200) {
+					console.log(`Could not upload file ${attachment.filename}`);
+				} else {
+					const { data } = await response.json<any>();
+					await env.db.put("scans:" + key, "", { metadata: { created: Date.now(), vtid: data.id } });
+					console.log(`Started scaning ${attachment.filename}`);
+				}
 			}));
 
 			const reply = createMimeMessage();
