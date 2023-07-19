@@ -131,6 +131,7 @@ export default {
 					["Accept", "application/json"],
 					["x-apikey", env.VIRUS_TOTAL_API_KEY]]);
 				const response = await fetch("https://www.virustotal.com/api/v3/files", {
+					method: 'post',
 					headers, body
 				});
 				if (response.status != 200) {

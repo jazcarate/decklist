@@ -25,8 +25,6 @@ interface Analyses {
 	}
 }
 
-const SCAN_TIME = 300000; // 5 minutes
-
 export default {
 	async scheduled(event: ScheduledEvent, env: Env, ctx: ExecutionContext) {
 		console.log(`trigger fired at ${event.cron}`);
@@ -34,7 +32,6 @@ export default {
 		const prefix = "scans:";
 		const pending = (await env.db.list<ScanMetadata>({ prefix })).keys;
 
-		const now = Date.now();
 		const headers = new Headers([
 			["Accept", "application/json"],
 			["x-apikey", env.VIRUS_TOTAL_API_KEY]]);
@@ -42,29 +39,33 @@ export default {
 			const key = analysis.name.substring(prefix.length);
 
 			try {
-				if (analysis.metadata?.created ?? 0 > now - SCAN_TIME) { //ignore very recent uploads
-					const response = await fetch(`https://www.virustotal.com/api/v3/analyses/{id}${analysis?.metadata?.vtid}`);
-					if (response.status != 200) throw new Error(`Could not get analysis for '${key}'`);
+				const vtid = analysis?.metadata?.vtid as string;
+				const response = await fetch(
+					`https://www.virustotal.com/api/v3/analyses/${vtid}`,
+					{ headers });
+				if (response.status != 200) throw new Error(`Could not get analysis for '${key}'`);
 
-					const { stats, status, results } = await response.json<Analyses>();
-					if (status === 'completed') {
-						let scan;
-						if (stats.malicious == 0 && stats.suspicious == 0) {
-							scan = { ok: true };
-						} else {
-							console.log(`Problematic file ${key}`, results);
-							const problem = Object.entries(results)
-								.find(([_av, result]) => result.category === "suspicious" || result.category === "malicious")
-							scan = { ok: false, problem: problem ? `${problem[0]}: ${problem[1].result}` : "This file is fishy" };
-						}
-						await env.db.delete(analysis.name);
-						await env.db.put(key, "", { metadata: scan });
+				const json = await response.json<{ data: { attributes: Analyses } }>();
+				const { stats, status, results } = json.data.attributes;
+				if (status === 'completed') {
+					let scan;
+					if (stats.malicious == 0 && stats.suspicious == 0) {
+						scan = { ok: true };
 					} else {
-						console.log(`${key} not analysed yet.`);
+						console.log(`Problematic file ${key}`, results);
+						const problem = Object.entries(results)
+							.find(([_av, result]) => result.category === "suspicious" || result.category === "malicious")
+						scan = { ok: false, problem: problem ? `${problem[0]}: ${problem[1].result}` : "This file is fishy" };
 					}
+					await env.db.delete(analysis.name);
+					await env.db.put(key, "", { metadata: scan });
+				} else {
+					console.log(`${key} not analysed yet.`);
 				}
 			} catch (error) {
 				console.error(error);
+			} finally {
+				console.log(`Scaned ${key}`);
 			}
 		}
 	},
