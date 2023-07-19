@@ -14,7 +14,6 @@ send_email = [
    {type = "send_email", name = "email"}
 ]
 
-
 analytics_engine_datasets = [
     { binding = "emailMetrics", dataset = "emailMetrics" }
 ]
