@@ -166,7 +166,7 @@ export default {
 			console.log("Done");
 		} catch (err) {
 			console.error(err);
-			success = "error " + typeof err;
+			success = "error " + err;
 		} finally {
 			env.emailMetrics.writeDataPoint({ blobs: [success], indexes: [slug] });
 		}
