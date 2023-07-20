@@ -8,7 +8,7 @@
     </header>
 
     <form id="search" hx-push-url=true class="searchbar" action="/e/{{slug}}" method="get"
-        hx-trigger="keyup change from:input delay:500ms, submit, search">
+        hx-trigger="keyup from:input delay:500ms, submit, search, load">
         <input type="submit" value="🔎" alt="Search">
         <input id="iNeedAnIdToSmartSwap" type="search" name="q" value="{{q}}" placeholder="Search">
     </form>
@@ -28,7 +28,7 @@
                         {{/name}}
                     </p>
                     <p class="subject">{{subject}}</p>
-                    <p class="note">{{note}}</p>
+                    {{#note}}<p class="note">📝 {{.}}</p>{{/note}}
                 </div>
                 <div class="info">
                     <span class="date" hx-ext="date" data-date="{{date}}"></span>

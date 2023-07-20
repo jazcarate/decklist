@@ -1,16 +1,53 @@
-{{#attachments}}
-{{#safe}}
-<object data="{{link}}" border="1">
-    <p>Unable to display file. <a href="{{link}}">Download</a> instead.</p>
-</object>
-{{/safe}}
-{{^safe}}
-This attachment might not be safe because '{{problem}}'.
-Download at your own risk!
-<a href="{{link}}">Download</a>
-{{/safe}}
-<hr />
-{{/attachments}}
-{{^attachments}}
-No content 😕
-{{/attachments}}
+<div id="container">
+    <header>
+        <p class="title">{{slug}}@decklist.fun
+            <span class="copy" hx-on:click="copy('{{slug}}@decklist.fun')">📋</span>
+
+        </p>
+        <p class="sub">
+            From:
+            {{#name}}
+            {{.}}<small> ({{from}})</small>
+            {{/name}}
+            {{^name}}
+            {{from}}
+            {{/name}}
+        </p>
+    </header>
+
+    <form id="updateMail" action="/e/{{slug}}/mail/{{id}}" method="post" hx-target="this" hx-select="#updateMail"
+        hx-push-url="false">
+        <h1>{{subject}}</h1>
+        <span class="date" hx-ext="date" data-date="{{date}}"></span>
+
+        <label for="reviewed">reviewed</label>
+        <input type="checkbox" name='reviewed' {{#reviewed}}checked{{/reviewed}}>
+        <br />
+
+        <label for="note">note</label>
+        <textarea name='note'>{{note}}</textarea><br />
+
+        <input type="submit" />
+    </form>
+
+    <div id="attachments">
+        {{#attachments}}
+        {{idx}}
+        {{#safe}}
+        <object data="{{link}}" border="1">
+            <p>Unable to display file. <a href="{{link}}">Download</a> instead.</p>
+        </object>
+        {{/safe}}
+        {{^safe}}
+        This attachment might not be safe because '{{problem}}'.
+        Download at your own risk!
+        <a href="{{link}}">Download</a>
+        {{/safe}}
+        <hr />
+        {{/attachments}}
+        {{^attachments}}
+        No content 😕
+        {{/attachments}}
+    </div>
+
+</div>
