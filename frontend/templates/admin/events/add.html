@@ -5,6 +5,12 @@
     <input required name='from' value="{{from}}" /><br />
     <label for="subject">subject</label>
     <input name='subject' value="{{subject}}" /><br />
+    <label for="safe">safe</label>
+    <select name="safe">
+        <option selected value="yes">yes</option>
+        <option value="pending">pending</option>
+        <option value="no">no</option>
+    </select><br />
 
     <label for="attachments">attachments</label>
     <input type="file" multiple name="attachments" /><br />

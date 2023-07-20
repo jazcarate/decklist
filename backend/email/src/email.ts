@@ -1,4 +1,4 @@
-import PostalMime from "postal-mime";
+import PostalMime, { Attachment } from "postal-mime";
 import { EmailMessage } from "cloudflare:email";
 import { createMimeMessage } from "mimetext";
 
@@ -33,6 +33,10 @@ function randId() {
 	var arr = new Uint8Array(3)
 	crypto.getRandomValues(arr)
 	return Array.from(arr, v => v.toString(16).padStart(2, "0")).join('')
+}
+
+function isProblematic(attachment: Attachment): boolean {
+	return attachment.mimeType.startsWith("image/") || attachment.mimeType.startsWith("text/");
 }
 
 export default {
@@ -114,33 +118,40 @@ export default {
 					contentType: "text/plain", contentDisposition: `inline; filename="body.txt"`
 				}
 			});
-			console.log(`Saved attachment '0'`);
+			console.log(`Saved attachment '0' (body)`);
 
 			await Promise.all(email.attachments.map(async (attachment, idx) => {
 				const key = bodyKey + String(idx + 1);
 				const obj = await env.content.put(key, attachment.content, {
 					httpMetadata: {
-						contentType: attachment.mimeType, contentDisposition: `inline; filename="${attachment.filename}"`
+						contentType: attachment.mimeType, contentDisposition: `${attachment.disposition}; filename="${attachment.filename}"`
 					}
 				});
 				console.log(`Saved attachment '${idx + 1}' ${obj.size}bytes`);
 
-				const body = new FormData();
-				body.set("file", new Blob([attachment.content], { type: attachment.mimeType }), attachment.filename);
-				const headers = new Headers([
-					["Accept", "application/json"],
-					["x-apikey", env.VIRUS_TOTAL_API_KEY]]);
-				const response = await fetch("https://www.virustotal.com/api/v3/files", {
-					method: 'post',
-					headers, body
-				});
-				if (response.status != 200) {
-					console.log(`Could not upload file ${attachment.filename}`);
+				let safe;
+				if (isProblematic(attachment)) {
+					const body = new FormData();
+					body.set("file", new Blob([attachment.content], { type: attachment.mimeType }), attachment.filename);
+					const headers = new Headers([
+						["Accept", "application/json"],
+						["x-apikey", env.VIRUS_TOTAL_API_KEY]]);
+					const response = await fetch("https://www.virustotal.com/api/v3/files", {
+						method: 'post',
+						headers, body
+					});
+					if (response.status != 200) {
+						console.log(`Could not upload file ${attachment.filename}`);
+					} else {
+						const { data } = await response.json<any>();
+						await env.db.put("scans:" + key, "", { metadata: { created: Date.now(), vtid: data.id } });
+						console.log(`Started scaning ${attachment.filename}`);
+					}
+					safe = 'pending';
 				} else {
-					const { data } = await response.json<any>();
-					await env.db.put("scans:" + key, "", { metadata: { created: Date.now(), vtid: data.id } });
-					console.log(`Started scaning ${attachment.filename}`);
+					safe = 'yes';
 				}
+				await env.db.put(key, "", { metadata: { safe } });
 			}));
 
 			const reply = createMimeMessage();
