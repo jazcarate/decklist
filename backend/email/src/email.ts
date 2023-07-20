@@ -129,7 +129,6 @@ export default {
 				});
 				console.log(`Saved attachment '${idx + 1}' ${obj.size}bytes`);
 
-				let safe;
 				if (isProblematic(attachment)) {
 					const body = new FormData();
 					body.set("file", new Blob([attachment.content], { type: attachment.mimeType }), attachment.filename);
@@ -147,11 +146,9 @@ export default {
 						await env.db.put("scans:" + key, "", { metadata: { created: Date.now(), vtid: data.id } });
 						console.log(`Started scaning ${attachment.filename}`);
 					}
-					safe = 'pending';
 				} else {
-					safe = 'yes';
+					await env.db.put(key, "", { metadata: { safe: true } });
 				}
-				await env.db.put(key, "", { metadata: { safe } });
 			}));
 
 			const reply = createMimeMessage();

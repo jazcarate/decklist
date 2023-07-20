@@ -21,7 +21,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, params, request }
     const from = form.get("from");
     const name = form.get("mailName");
     const subject = form.get("subject");
-    const safe = form.get("safe");
+    const safe = form.get("safe") ?? false;
     const date = Date.now();
     const metadata = { from, name, subject, reviewed: false, date };
 
@@ -37,8 +37,8 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, params, request }
                 contentType: attachment.type, contentDisposition: `inline; filename="${attachment.name}"`
             }
         });
-        await env.db.put(key, "", { metadata: { safe } });
+        await env.db.put(key, "", { metadata: { safe: Boolean(safe) } });
     }));
 
-    return renderPartial(adminMail, { from, name, subject, slug, id });
+    return renderPartial(adminMail, { from, name, subject, slug, id, safe });
 }

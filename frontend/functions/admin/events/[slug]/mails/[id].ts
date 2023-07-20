@@ -16,6 +16,8 @@ export const onRequestDelete: PagesFunction<Env> = async ({ env, params }) => {
     const content = await env.content.list({ prefix: `event:${slug}:mail:${id}:attachments:` });
     for (const mail of content.objects) {
         await env.content.delete(mail.key);
+        await env.db.delete(mail.key);
+        await env.db.delete("scans:" + mail.key);
     }
 
     console.log(`Deleted mail ev${slug}-em${id} (${content.objects.length} mails contents)...`);

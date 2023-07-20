@@ -1,7 +1,14 @@
 {{#attachments}}
+{{#safe}}
 <object data="{{link}}" border="1">
     <p>Unable to display file. <a href="{{link}}">Download</a> instead.</p>
 </object>
+{{/safe}}
+{{^safe}}
+This attachment might not be safe because '{{problem}}'.
+Download at your own risk!
+<a href="{{link}}">Download</a>
+{{/safe}}
 <hr />
 {{/attachments}}
 {{^attachments}}

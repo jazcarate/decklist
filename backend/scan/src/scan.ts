@@ -50,12 +50,12 @@ export default {
 				if (status === 'completed') {
 					let scan;
 					if (stats.malicious == 0 && stats.suspicious == 0) {
-						scan = { safe: 'yes' };
+						scan = { safe: true };
 					} else {
 						console.log(`Problematic file ${key}`, results);
 						const problem = Object.entries(results)
 							.find(([_av, result]) => result.category === "suspicious" || result.category === "malicious")
-						scan = { ok: 'no', problem: problem ? `${problem[0]}: ${problem[1].result}` : "This file is fishy" };
+						scan = { safe: false, problem: problem ? `${problem[0]}: ${problem[1].result}` : "This file is fishy" };
 					}
 					await env.db.delete(analysis.name);
 					await env.db.put(key, "", { metadata: scan });

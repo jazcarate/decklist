@@ -1,7 +1,7 @@
 <div id="addAttachment">
     <h2>Add attachment</h2>
     <form hx-push-url="false" id="attachment-upload" action="/admin/events/{{slug}}/add" method="post"
-        hx-encoding="multipart/form-data" hx-target="#mails" hx-swap="beforeend">
+        hx-encoding="multipart/form-data" hx-target="#mails" hx-swap="afterbegin">
         <label for="from">from</label>
         <input required name='from' type="email" /><br />
 
@@ -10,6 +10,9 @@
 
         <label for="subject">subject</label>
         <input name='subject' /><br />
+
+        <label for="safe">safe</label>
+        <input type="checkbox" name='safe' {{#safe}}checked{{/safe}} value="true"><br />
 
         <label for="attachments">attachments</label>
         <input type="file" multiple required name="attachments" /><br />

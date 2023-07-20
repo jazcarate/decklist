@@ -14,11 +14,21 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env, params })
     const prefix = `event:${slug}:mail:${mail}:attachments:`;
     const mails = await env.content.list({ prefix });
 
-    const attachments = mails.objects.map(obj => {
+    let attachments = [];
+    for (const obj of mails.objects) {
+        const status = await env.db.getWithMetadata<any>(obj.key);
+        let safe, problem: string;
+        if (!status.metadata) {
+            safe = false;
+            problem = "Not yet scanned"
+        } else {
+            safe = status.metadata.safe;
+            problem = status.metadata.problem;
+        }
         const idx = obj.key.substring(prefix.length);
         const link = `${url.protocol}//${url.host}/e/${slug}/mail/${mail}/${idx}`;
-        return { link };
-    });
+        attachments.push({ link, safe, problem });
+    }
 
     return renderPartial(mailTemplate, { attachments, slug });
 }

@@ -27,7 +27,8 @@ export const onRequestDelete: PagesFunction<Env> = async ({ env, params }) => {
 
     const mailsContents = await env.content.list({ prefix: `event:${slug}:mail:` });
     for (const obj of mailsContents.objects) {
-        await env.content.delete(obj.key)
+        await env.db.delete(obj.key);
+        await env.content.delete(obj.key);
     }
 
     console.log(`Deleted event ${slug} (${mails.keys.length} mails, ${mailsContents.objects.length} contents)...`);
@@ -77,6 +78,16 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, params, request }
                 const newObjKey = obj.key.replace(slug, newSlug);
                 await env.content.put(newObjKey, await obj.arrayBuffer(), { ...obj });
                 await env.content.delete(objRef.key);
+
+                const attachment = await env.db.getWithMetadata(objRef.key);
+                await env.db.put(newObjKey, attachment.value, attachment.metadata);
+                await env.db.delete(objRef.key);
+
+                const scan = await env.db.getWithMetadata("scans:" + objRef.key);
+                if (scan) {
+                    await env.db.put("scans:" + newObjKey, scan.value, scan.metadata);
+                    await env.db.delete("scans:" + objRef.key);
+                }
 
                 console.log(` - Object ${newObjKey}`);
             }
