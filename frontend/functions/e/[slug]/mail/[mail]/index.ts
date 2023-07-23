@@ -78,7 +78,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env, params })
         attachments.push({ idx, link, safe, problem, fileName, refreshable, ...extra });
     }
 
-    return renderFull(mailTemplate, { ...mail?.metadata, attachments, slug, id });
+    return renderFull(mailTemplate, { ...mail?.metadata, title: mail?.metadata?.from, attachments, slug, id });
 }
 
 
