@@ -26,7 +26,7 @@
                         {{from}}
                         {{/name}}
                     </p>
-                    <p class="subject">{{subject}}</p>
+                    {{#subject}}<p class="subject">{{.}}</p>{{/subject}}
                     {{#note}}<p class="note">📝 {{.}}</p>{{/note}}
                 </div>
                 <div class="info">

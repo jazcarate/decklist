@@ -127,7 +127,7 @@ export default {
 
 			const bodyKey = `event:${slug}:mail:${id}:attachments:`;
 			if (email.text) {
-				await env.content.put(bodyKey + "0", `${email.subject}\n\n${email.text}`, {
+				await env.content.put(bodyKey + "0", email.text, {
 					httpMetadata: {
 						contentType: "text/plain", contentDisposition: `inline; filename="body.txt"`
 					}

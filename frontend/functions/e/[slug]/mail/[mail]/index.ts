@@ -69,8 +69,6 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env, params })
         attachments.push({ idx, link, safe, problem, ...extra });
     }
 
-    console.log({ attachments });
-
     return renderFull(mailTemplate, { ...mail.metadata, attachments, slug, id });
 }
 
@@ -94,5 +92,5 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env, params }
         }
     });
 
-    return renderPartial(mailTemplate, { ...mail.metadata, reviewed, note, slug, id });
+    return new Response("", { status: 204, statusText: "No Content" });
 }

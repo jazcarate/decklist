@@ -187,6 +187,8 @@ header {
 
 header a {
     text-decoration: none;
+    color: inherit;
+
 }
 
 header .title {
