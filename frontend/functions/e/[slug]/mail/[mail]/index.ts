@@ -36,21 +36,30 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env, params })
     const metadata = await env.db.list<AttachmentMetadata>({ prefix });
 
     let attachments = [];
+    let refreshable: boolean = false
     for (const obj of contents.objects) {
         const status = metadata.keys.find(({ name }) => name == obj.key);
         let safe: boolean, problem: string;
-        if (status.metadata) {
+        if (status && status.metadata) {
             safe = status.metadata.safe;
             problem = status.metadata.problem;
         } else {
             safe = false;
             problem = "Not yet scanned";
+            refreshable = true;
         }
         const idx = obj.key.substring(prefix.length);
         const link = `${url.protocol}//${url.host}/e/${slug}/mail/${id}/${idx}`;
 
         const object = await env.content.get(obj.key)
         const type = object.httpMetadata?.contentType;
+
+        let fileName: string
+        const matchName = object.httpMetadata?.contentType?.match(/filename=".+"/)
+        if (matchName)
+            fileName = matchName[0];
+        else
+            fileName = "no.name";
 
         let extra: { text?: string; html?: string; img?: boolean, object?: string, fileName?: string; };
 
@@ -64,17 +73,9 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env, params })
                 extra = { img: true };
             } else if (type == "application/pdf" || type == "application/x-pdf") {
                 extra = { object: type }
-            } else {
-                let fileName: string
-                const matchName = object.httpMetadata?.contentType?.match(/filename=".+"/)
-                if (matchName)
-                    fileName = matchName[0];
-                else
-                    fileName = "no.name";
-                extra = { fileName }
             }
         }
-        attachments.push({ idx, link, safe, problem, ...extra });
+        attachments.push({ idx, link, safe, problem, fileName, refreshable, ...extra });
     }
 
     return renderFull(mailTemplate, { ...mail?.metadata, attachments, slug, id });

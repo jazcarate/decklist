@@ -60,16 +60,19 @@
             {{#fileName}}
             <span>A file named <code>{{.}}</code></span>
             {{/fileName}}
-
-
-            <br />
             {{/safe}}
             {{^safe}}
-            This attachment might not be safe because '{{problem}}'.
+            This attachment (<code>{{fileName}} - {{type}}</code>) might not be safe because '{{problem}}'.
             Open at your own risk!
             {{/safe}}
+            <br />
             <a href="{{link}}" target="_blank" rel="noopener noreferrer">Open</a></p>
             <hr />
+            {{#refreshable}}
+            <form action="/e/{{slug}}/mail/{{id}}/scan" method="post" hx-target="#attachments" hx-swap="#attachments">
+                <button type="submit">Force scan!</button>
+            </form>
+            {{/refreshable}}
             {{/attachments}}
             {{^attachments}}
             No content 😕
