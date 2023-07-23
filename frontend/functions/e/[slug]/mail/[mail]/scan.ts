@@ -11,11 +11,11 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, params }) => {
         headers: new Headers([["content-type", 'application/json']]),
         body: JSON.stringify({ slug, mail }),
     }));
-    const updated = await response.json();
+    const updated = await response.json<string[] | null>();
 
 
     const headers = new Headers()
-    if (updated)
+    if (updated && updated.length > 0)
         headers.append("HX-Refresh", "true");
 
     return new Response("", { status: 204, statusText: "No Content", headers });
