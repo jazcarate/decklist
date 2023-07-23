@@ -44,7 +44,9 @@
             {{/html}}
 
             {{#img}}
-            <img src="{{link}}" />
+            <a href="{{link}}" target="_blank" rel="noopener noreferrer">
+                <img src="{{link}}" />
+            </a>
             {{/img}}
 
             {{#object}}
@@ -55,9 +57,9 @@
             </object>
             {{/object}}
 
-            {{#name}}
+            {{#fileName}}
             <span>A file named <code>{{.}}</code></span>
-            {{/name}}
+            {{/fileName}}
 
 
             <br />

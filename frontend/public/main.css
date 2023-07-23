@@ -340,6 +340,7 @@ header .sub {
 }
 
 #mail h1 {
+    word-break: break-all;
     text-align: center;
 }
 
