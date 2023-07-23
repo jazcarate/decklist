@@ -13,7 +13,6 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, params }) => {
     }));
     const updated = await response.json<string[] | null>();
 
-
     const headers = new Headers()
     if (updated && updated.length > 0)
         headers.append("HX-Refresh", "true");

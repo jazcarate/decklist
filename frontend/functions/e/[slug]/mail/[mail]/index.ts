@@ -55,7 +55,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env, params })
         const type = object.httpMetadata?.contentType;
 
         let fileName: string
-        const matchName = object.httpMetadata?.contentType?.match(/filename=".+"/)
+        const matchName = object.httpMetadata?.contentDisposition?.match(/filename=".+"/)
         if (matchName)
             fileName = matchName[0];
         else
