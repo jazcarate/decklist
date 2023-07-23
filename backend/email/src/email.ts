@@ -24,7 +24,7 @@ async function readAll(stream: ReadableStream, size: number): Promise<Uint8Array
 }
 
 function slugFrom(adress: string): string {
-	return adress.split("@", 1)[0];
+	return adress.split("@", 1)[0].toLowerCase();
 }
 
 function randId() {

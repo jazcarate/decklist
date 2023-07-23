@@ -14,7 +14,7 @@ interface Env {
 export const onRequestPost: PagesFunction<Env> = async ({ env, data, request, waitUntil }) => {
     const json = await request.formData();
     const name = json.get("name");
-    const slug = json.get("slug");
+    let slug = json.get("slug");
 
     const view = { title: "New event", slug, name };
 
@@ -22,6 +22,8 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, data, request, wa
 
     if (!slug)
         return renderFull(createEvent, { ...view, validated: true });
+
+    slug = slug.toLowerCase();
 
     const existingEvent = await env.db.get(`events:${slug}`);
     if (existingEvent != null) {
@@ -37,7 +39,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, data, request, wa
 
     const url = new URL(request.url);
     const manageLink = `${url.protocol}//${url.host}/e/${slug}/login?p=${secret}`;
-    return renderFull(createdEvent, { ...view, manageLink, secret });
+    return renderFull(createdEvent, { ...view, slug, manageLink, secret });
 }
 
 export const onRequestGet: PagesFunction<Env> = async () => {

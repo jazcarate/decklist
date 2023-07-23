@@ -6,8 +6,8 @@
     <br />
 
     <label for="slug">slug</label>
-    <input id="slug" name="slug" value="{{slug}}" {{#validated}}{{#slugExists}}class="error"
-        {{/slugExists}}{{/validated}} />
+    <input id="slug" name="slug" autocapitalize="none" style="text-transform: lowercase;" value="{{slug}}"
+        {{#validated}}{{#slugExists}}class="error" {{/slugExists}}{{/validated}} />
     {{#validated}}{{#slugExists}}
     The slug is taken
     {{/slugExists}}{{/validated}}

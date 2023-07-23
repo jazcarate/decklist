@@ -343,12 +343,12 @@ header .sub {
 #fullscreen .close {
     position: fixed;
     top: 20px;
-    left: 20px;
+    right: 20px;
     padding: 5px;
     font-size: 30px;
 }
 
 #fullscreen .container {
-    transform: rotate(-90deg);
+    transform: rotate(90deg);
     font-size: clamp(16px, 9vh, 70px);
 }
