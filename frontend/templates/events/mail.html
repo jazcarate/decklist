@@ -9,61 +9,69 @@
         </p>
     </header>
 
-    <h1>
-        {{#name}}{{.}}<small> ({{from}})</small>{{/name}}
-        {{^name}}{{from}}{{/name}}
-    </h1>
-    <span class="date" hx-ext="date" data-date="{{date}}"></span>
+    <div id="mail">
 
-    <form id="updateMail" action="/e/{{slug}}/mail/{{id}}"
-        hx-trigger="keyup delay:500ms, change from:input[type='checkbox']" method="post" hx-push-url="false">
-        <label for="reviewed">reviewed</label>
-        <input type="checkbox" name='reviewed' {{#reviewed}}checked{{/reviewed}}>
-        <br />
+        <form id="updateMail" action="/e/{{slug}}/mail/{{id}}"
+            hx-trigger="keyup delay:500ms, change from:input[type='checkbox']" method="post" hx-push-url="false">
 
-        <label for="note">note</label>
-        <textarea name='note'>{{note}}</textarea><br />
-    </form>
+            <h1>
+                {{#name}}{{.}}<small> ({{from}})</small>{{/name}}
+                {{^name}}{{from}}{{/name}}
+                <input type="checkbox" name='reviewed' {{#reviewed}}checked{{/reviewed}}>
+            </h1>
+            <div class="date" hx-ext="date" data-date="{{date}}"></div>
 
-    {{#subject}}<h2>{{.}}</h2>{{/subject}}
-    <div id="attachments">
-        {{#attachments}}
-        {{#safe}}
+            <textarea placeholder="Add a note" name='note'>{{note}}</textarea><br />
+        </form>
 
-        {{#text}}
-        <p>{{.}}</p>
-        {{/text}}
+        <h2>Subject:
+            {{#subject}}{{.}}{{/subject}}
 
-        {{#html}}
-        <em>HTML is partially rendered.If you want to see the original, unsanitized version (might be unsafe) <a
-                href="{{link}}" target="_blank" rel="noopener noreferrer">download it</a>.</em>
-        <div class="embedded">{{{.}}}</div>
-        {{/html}}
+            {{^subject}}<small>[No Subject]</small>{{/subject}}
+        </h2>
+        <div id="attachments">
+            {{#attachments}}
+            {{#safe}}
 
-        {{#img}}
-        <img src="{{link}}" />
-        {{/img}}
+            {{#text}}
+            <p>{{.}}</p>
+            {{/text}}
 
-        {{#object}}
-        <object type="{{.}}" data="{{link}}">
-            Can't display {{type}}. Please <a href="{{link}}" target="_blank" rel="noopener noreferrer">download</a> to
-            see it.
-        </object>
-        {{/object}}
+            {{#html}}
+            <em>HTML is partially rendered.If you want to see the original, unsanitized version (might be unsafe) <a
+                    href="{{link}}" target="_blank" rel="noopener noreferrer">download it</a>.</em>
+            <div class="embedded">{{{.}}}</div>
+            {{/html}}
 
-        <br />
-        <a href="{{link}}" target="_blank" rel="noopener noreferrer">Download</a>.</p>
-        {{/safe}}
-        {{^safe}}
-        This attachment might not be safe because '{{problem}}'.
-        Open at your own risk!
-        <a href="{{link}}" target="_blank" rel="noopener noreferrer">Open</a>
-        {{/safe}}
-        <br />
-        {{/attachments}}
-        {{^attachments}}
-        No content 😕
-        {{/attachments}}
+            {{#img}}
+            <img src="{{link}}" />
+            {{/img}}
+
+            {{#object}}
+            <object type="{{.}}" data="{{link}}">
+                Can't display {{type}}. Please <a href="{{link}}" target="_blank" rel="noopener noreferrer">download</a>
+                to
+                see it.
+            </object>
+            {{/object}}
+
+            {{#name}}
+            <span>A file named <code>{{.}}</code></span>
+            {{/name}}
+
+
+            <br />
+            {{/safe}}
+            {{^safe}}
+            This attachment might not be safe because '{{problem}}'.
+            Open at your own risk!
+            {{/safe}}
+            <a href="{{link}}" target="_blank" rel="noopener noreferrer">Open</a></p>
+            <hr />
+            {{/attachments}}
+            {{^attachments}}
+            No content 😕
+            {{/attachments}}
+        </div>
     </div>
-
 </div>
