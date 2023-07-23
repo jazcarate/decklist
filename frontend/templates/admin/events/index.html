@@ -1,8 +1,7 @@
 <a href="/admin">Back</a>
 <br />
 
-<form action="/admin/events" method="get" hx-trigger="keyup change from:input delay:500ms, submit, search"
-    hx-swap="outerHTML">
+<form action="/admin/events" method="get" hx-trigger="keyup from:input delay:500ms, submit, search" hx-swap="outerHTML">
     <input type="search" name="q" value="{{q}}" placeholder="Search events...">
     <input type="submit">
 </form>

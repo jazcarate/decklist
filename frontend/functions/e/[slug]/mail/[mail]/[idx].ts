@@ -12,13 +12,8 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env, params })
     }
 
     const headers = new Headers();
-    headers.set("ETag", object.httpEtag);
     headers.set("Content-Security-Policy", "sandbox;");
-
-    if (object.httpMetadata?.contentDisposition)
-        headers.set("Content-Disposition", object.httpMetadata?.contentDisposition);
-    if (object.httpMetadata?.contentType)
-        headers.set("Content-Type", object.httpMetadata?.contentType);
+    object.writeHttpMetadata(headers)
 
     return new Response(object.body, {
         headers,

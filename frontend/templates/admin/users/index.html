@@ -1,7 +1,7 @@
 <a href="/admin">Back</a>
 <br />
 
-<form action="/admin/users" method="get" hx-trigger="keyup change from:input delay:500ms, submit, search"
+<form action="/admin/users" method="get" hx-trigger="keyup from:input delay:500ms, submit, search"
     hx-select="#search-results" hx-target="#search-results" hx-swap="outerHTML">
     <input type="search" name="qevent" value="{{qevent}}" placeholder="Search Events...">
     <input type="search" name="qtoken" value="{{qtoken}}" placeholder="Search Users...">

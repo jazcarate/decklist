@@ -32,6 +32,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, params, request }
     const attachments = form.getAll("attachments") as unknown as File[];
     await Promise.all(attachments.map(async (attachment, idx) => {
         const key = bodyKey + String(idx + 1);
+        console.log("Adding", attachment.type);
         await env.content.put(key, await attachment.arrayBuffer(), {
             httpMetadata: {
                 contentType: attachment.type, contentDisposition: `inline; filename="${attachment.name}"`

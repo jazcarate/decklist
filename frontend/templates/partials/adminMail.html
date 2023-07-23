@@ -22,7 +22,7 @@
     <button hx-delete="/admin/events/{{slug}}/mails/{{id}}"
         hx-confirm="Are you sure you want to delete email from {{from}}?">Delete</button><br />
 
-    <button hx-get="/e/{{slug}}/mail/{{id}}" hx-target="this" hx-swap="outerHTML">
+    <button hx-get="/e/{{slug}}/mail/{{id}}" hx-target="this" hx-select="#attachments" hx-swap="outerHTML">
         Load attachments...
     </button>
 </form>

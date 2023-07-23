@@ -1,3 +1,5 @@
+import sanitizeHtml from 'sanitize-html';
+
 import { renderFull, renderPartial } from "../../../../render";
 import mailTemplate from "../../../../../templates/events/mail.html";
 
@@ -15,6 +17,11 @@ interface MailMetadata {
     reviewed: boolean;
 }
 
+interface AttachmentMetadata {
+    safe: boolean,
+    problem?: string
+}
+
 export const onRequestGet: PagesFunction<Env> = async ({ request, env, params }) => {
     const slug = params.slug as string;
     const id = params.mail as string;
@@ -25,23 +32,43 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env, params })
     if (!mail.metadata) return new Response("Email not found", { status: 404 });
 
     const prefix = `event:${slug}:mail:${id}:attachments:`;
-    const dbAttachments = await env.content.list({ prefix });
+    const contents = await env.content.list({ prefix });
+    const metadata = await env.db.list<AttachmentMetadata>({ prefix });
 
     let attachments = [];
-    for (const obj of dbAttachments.objects) {
-        const status = await env.db.getWithMetadata<any>(obj.key);
-        let safe, problem: string;
+    for (const obj of contents.objects) {
+        const status = metadata.keys.find(({ name }) => name == obj.key);
+        let safe: boolean, problem: string;
         if (!status.metadata) {
             safe = false;
-            problem = "Not yet scanned"
+            problem = "Not yet scanned";
         } else {
             safe = status.metadata.safe;
             problem = status.metadata.problem;
         }
         const idx = obj.key.substring(prefix.length);
         const link = `${url.protocol}//${url.host}/e/${slug}/mail/${id}/${idx}`;
-        attachments.push({ idx, link, safe, problem });
+
+        const object = await env.content.get(obj.key)
+        const type = object.httpMetadata?.contentType;
+        let extra: { text?: string; html?: string; img?: boolean; };
+
+        console.log(JSON.stringify(object.httpMetadata));
+
+        if (type) {
+            if (type == "text/plain") {
+                extra = { text: await object.text() }
+            } else if (type == "text/html") {
+                const html = sanitizeHtml(await object.text());
+                extra = { html };
+            } else if (type.startsWith("image/")) {
+                extra = { img: true };
+            }
+        }
+        attachments.push({ idx, link, safe, problem, ...extra });
     }
+
+    console.log({ attachments });
 
     return renderFull(mailTemplate, { ...mail.metadata, attachments, slug, id });
 }
