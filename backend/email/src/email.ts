@@ -1,6 +1,4 @@
-import PostalMime, { Attachment } from "postal-mime";
-import { EmailMessage } from "cloudflare:email";
-import { createMimeMessage } from "mimetext";
+import PostalMime, { Attachment, Email } from "postal-mime";
 
 interface Env {
 	db: KVNamespace
@@ -35,14 +33,60 @@ function randId() {
 	return Array.from(arr, v => v.toString(16).padStart(2, "0")).join('')
 }
 
-function isProblematic(attachment: Attachment): boolean {
-	return attachment.mimeType.startsWith("image/") || attachment.mimeType.startsWith("text/");
+function isSafe(attachment: Attachment): boolean {
+	const { mimeType } = attachment;
+	return mimeType.startsWith("image/") || mimeType.startsWith("text/") || mimeType === "application/pdf";
+}
+
+async function reply(email: Email, slug: string, subject: string, body: string): Promise<void> {
+	let headers: any = {
+		"Auto-Submitted": "auto-replied",
+	};
+	const originalID = email.headers.find(({ key }) => key === "Message-ID");
+	if (originalID) {
+		headers = {
+			...headers,
+			"In-Reply-To": originalID.value,
+			"References": originalID.value
+		};
+	}
+	const mailChannelBody: any = JSON.stringify({
+		personalizations: [
+			{
+				to: [{ email: email.from.address, name: email.from.name }],
+				headers
+			}
+		],
+		from: {
+			email: `${slug}@decklist.fun`,
+			name: `${slug} at Decklist.fun`,
+		},
+		subject: email.subject ?? subject,
+		content: [
+			{
+				type: 'text/plain',
+				value: body,
+			},
+		],
+	});
+	const sendEmailResponse = await fetch(new Request('https://api.mailchannels.net/tx/v1/send', {
+		method: 'POST',
+		headers: {
+			'content-type': 'application/json',
+		},
+		body: mailChannelBody,
+	}));
+	const { status } = sendEmailResponse;
+	if (status != 200 && status != 202) {
+		throw new Error(`Coud't send the reply (${sendEmailResponse.status}-${sendEmailResponse.statusText}): ${await sendEmailResponse.text()}`);
+	}
 }
 
 export default {
 	async email(message: ForwardableEmailMessage, env: Env, ctx: ExecutionContext): Promise<void> {
 		let success = "unknown";
 		const slug = slugFrom(message.to);
+
 		try {
 			// TODO remove debug forward
 			await message.forward("j@florius.com.ar");
@@ -53,51 +97,20 @@ export default {
 			const event = await env.db.get(`events:${slug}`);
 			if (!event) {
 				console.log(`Discarding email from '${message.from}'. No event '${slug}'`);
-
-				const reply = createMimeMessage();
-				reply.setSender({
-					name: "Decklist.fun", addr: message.to
-				});
-				const originalID = message.headers.get("Message-ID");
-				if (originalID) {
-					reply.setHeader("In-Reply-To", originalID);
-					reply.setHeader("References", originalID);
-				}
-				reply.setHeader("Auto-Submitted", "auto-replied");
-				reply.setRecipient(message.from);
-				reply.setSubject(email.subject ?? "Problem submitting the decklist");
-				reply.addMessage({
-					contentType: 'text/plain',
-					data: `Sorry!\nWe didn't find the event "${slug}" at ${message.to}. Check with your tournament officials.`
-				});
-
-				await env.email.send(new EmailMessage(message.to, message.from, reply.asRaw()));
 				success = "discarded"
+				await reply(email, slug,
+					"Problem submitting the decklist",
+					`Sorry!\nWe didn't find the event "${slug}" at ${message.to}. Check with your tournament officials.`);
 				return;
 			}
 
 			if (email.attachments.length == 0 && !email.text) {
 				console.log(`Discarding email from '${message.from}'. Empty email`);
-
-				const reply = createMimeMessage();
-				reply.setSender({
-					name: "Decklist.fun", addr: message.to
-				});
-				const originalID = message.headers.get("Message-ID");
-				if (originalID) {
-					reply.setHeader("In-Reply-To", originalID);
-					reply.setHeader("References", originalID);
-				}
-				reply.setHeader("Auto-Submitted", "auto-replied");
-				reply.setRecipient(message.from);
-				reply.setSubject(email.subject ?? "Problem submitting the decklist");
-				reply.addMessage({
-					contentType: 'text/plain',
-					data: `It appears you didn't send any decklist!\nPlease attach your decklist and try againl.`
-				});
-
-				await env.email.send(new EmailMessage(message.to, message.from, reply.asRaw()));
 				success = "empty"
+
+				await reply(email, slug,
+					"Problem submitting the decklist",
+					`It appears you didn't send any decklist!\nPlease attach your decklist and try again.`);
 				return;
 			}
 
@@ -113,13 +126,15 @@ export default {
 			console.log(`Saved email ${id}`);
 
 			const bodyKey = `event:${slug}:mail:${id}:attachments:`;
-			await env.content.put(bodyKey + "0", `${email.subject}\n\n${email.text}`, {
-				httpMetadata: {
-					contentType: "text/plain", contentDisposition: `inline; filename="body.txt"`
-				}
-			});
-			await env.db.put(bodyKey + "0", "", { metadata: { safe: true } });
-			console.log(`Saved attachment '0' (body)`);
+			if (email.text) {
+				await env.content.put(bodyKey + "0", `${email.subject}\n\n${email.text}`, {
+					httpMetadata: {
+						contentType: "text/plain", contentDisposition: `inline; filename="body.txt"`
+					}
+				});
+				await env.db.put(bodyKey + "0", "", { metadata: { safe: true } });
+				console.log(`Saved attachment '0' (body)`);
+			}
 
 			await Promise.all(email.attachments.map(async (attachment, idx) => {
 				const key = bodyKey + String(idx + 1);
@@ -130,7 +145,10 @@ export default {
 				});
 				console.log(`Saved attachment '${idx + 1}' ${obj.size}bytes`);
 
-				if (isProblematic(attachment)) {
+				if (isSafe(attachment)) {
+					console.log(`${key} is safe`);
+					await env.db.put(key, "", { metadata: { safe: true } });
+				} else {
 					const body = new FormData();
 					body.set("file", new Blob([attachment.content], { type: attachment.mimeType }), attachment.filename);
 					const headers = new Headers([
@@ -147,32 +165,15 @@ export default {
 						await env.db.put("scans:" + key, "", { metadata: { created: Date.now(), vtid: data.id } });
 						console.log(`Started scaning ${attachment.filename}`);
 					}
-				} else {
-					console.log(`${key} is safe`);
-					await env.db.put(key, "", { metadata: { safe: true } });
 				}
 			}));
 
-			const reply = createMimeMessage();
-			reply.setSender({
-				name: "Decklist.fun", addr: message.to
-			});
-			const originalID = message.headers.get("Message-ID");
-			if (originalID) {
-				reply.setHeader("In-Reply-To", originalID);
-				reply.setHeader("References", originalID);
-			}
-			reply.setHeader("Message-ID", `${id}@${slug}.decklist.fun`);
-			reply.setHeader("Auto-Submitted", "auto-replied");
-			reply.setRecipient(message.from);
-			reply.setSubject(email.subject ?? "Decklist submitted correctly");
-			reply.addMessage({
-				contentType: 'text/plain',
-				data: `Your submittion has been accepted! With the id: ev${slug}-em${id}.`
-			});
-
-			await env.email.send(new EmailMessage(message.to, message.from, reply.asRaw()));
 			success = "yes";
+			await reply(
+				email, slug,
+				"Decklist submitted correctly",
+				`Your submittion has been accepted! With the id: ev${slug}-em${id}.`
+			);
 			console.log("Done");
 		} catch (err) {
 			console.error(err);
