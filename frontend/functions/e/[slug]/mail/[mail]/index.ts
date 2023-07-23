@@ -39,12 +39,12 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env, params })
     for (const obj of contents.objects) {
         const status = metadata.keys.find(({ name }) => name == obj.key);
         let safe: boolean, problem: string;
-        if (!status.metadata) {
-            safe = false;
-            problem = "Not yet scanned";
-        } else {
+        if (status.metadata) {
             safe = status.metadata.safe;
             problem = status.metadata.problem;
+        } else {
+            safe = false;
+            problem = "Not yet scanned";
         }
         const idx = obj.key.substring(prefix.length);
         const link = `${url.protocol}//${url.host}/e/${slug}/mail/${id}/${idx}`;
@@ -77,7 +77,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env, params })
         attachments.push({ idx, link, safe, problem, ...extra });
     }
 
-    return renderFull(mailTemplate, { ...mail.metadata, attachments, slug, id });
+    return renderFull(mailTemplate, { ...mail?.metadata, attachments, slug, id });
 }
 
 

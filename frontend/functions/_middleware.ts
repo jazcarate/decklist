@@ -42,4 +42,4 @@ const authentication: PagesFunction<Env> = async ({ request, env, next, data }) 
 }
 
 
-export const onRequest = [errorHandling, authentication];
+export const onRequest = [authentication];
