@@ -147,6 +147,7 @@ export default {
 						console.log(`Started scaning ${attachment.filename}`);
 					}
 				} else {
+					console.log(`${key} is safe`);
 					await env.db.put(key, "", { metadata: { safe: true } });
 				}
 			}));

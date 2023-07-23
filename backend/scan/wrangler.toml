@@ -3,12 +3,17 @@ main = "src/scan.ts"
 compatibility_date = "2023-05-15"
 
 kv_namespaces = [
-    { binding = "db", id = "f68f7a8b3b9e4c60aa8368023eac658a" }
+    { binding = "db", id = "f68f7a8b3b9e4c60aa8368023eac658a", preview_id = "f68f7a8b3b9e4c60aa8368023eac658a" }
 ]
 
 r2_buckets = [
-    { binding = "content", bucket_name = "emails-content" } 
+    { binding = "content", bucket_name = "emails-content", preview_bucket_name="emails-content" } 
 ]
+
+analytics_engine_datasets = [
+    { binding = "emailMetrics", dataset = "emailMetrics" }
+]
+
 
 # every hour
 [triggers]
