@@ -51,9 +51,8 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env, params })
 
         const object = await env.content.get(obj.key)
         const type = object.httpMetadata?.contentType;
-        let extra: { text?: string; html?: string; img?: boolean; };
 
-        console.log(JSON.stringify(object.httpMetadata));
+        let extra: { text?: string; html?: string; img?: boolean, object?: string; };
 
         if (type) {
             if (type == "text/plain") {
@@ -63,6 +62,8 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env, params })
                 extra = { html };
             } else if (type.startsWith("image/")) {
                 extra = { img: true };
+            } else if (type == "application/pdf" || type == "application/x-pdf") {
+                extra = { object: type }
             }
         }
         attachments.push({ idx, link, safe, problem, ...extra });

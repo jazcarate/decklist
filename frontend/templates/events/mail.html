@@ -48,6 +48,13 @@
         <img src="{{link}}" />
         {{/img}}
 
+        {{#object}}
+        <object type="{{.}}" data="{{link}}">
+            Can't display {{type}}. Please <a href="{{link}}" target="_blank" rel="noopener noreferrer">download</a> to
+            see it.
+        </object>
+        {{/object}}
+
         <br />
         <a href="{{link}}" target="_blank" rel="noopener noreferrer">Download</a>.</p>
         {{/safe}}
