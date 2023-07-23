@@ -14,8 +14,9 @@
         </p>
     </header>
 
-    <form id="updateMail" action="/e/{{slug}}/mail/{{id}}" method="post" hx-target="this" hx-select="#updateMail"
-        hx-push-url="false">
+    <form id="updateMail" action="/e/{{slug}}/mail/{{id}}"
+        hx-trigger="change from:input[type='checkbox'] delay:500ms, submit" method="post" hx-target="this"
+        hx-select="#updateMail" hx-push-url="false">
         <h1>{{subject}}</h1>
         <span class="date" hx-ext="date" data-date="{{date}}"></span>
 
