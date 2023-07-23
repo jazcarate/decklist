@@ -118,6 +118,7 @@ export default {
 					contentType: "text/plain", contentDisposition: `inline; filename="body.txt"`
 				}
 			});
+			await env.db.put(bodyKey + "0", "", { metadata: { safe: true } });
 			console.log(`Saved attachment '0' (body)`);
 
 			await Promise.all(email.attachments.map(async (attachment, idx) => {
