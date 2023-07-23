@@ -35,6 +35,10 @@
     <div id="progress">
         <div class="indeterminate"></div>
     </div>
+    <div id="fullscreen">
+        <div class="container">...@decklist.fun</div>
+        <button class="close" hx-on:click="fullscreen('')">❌</button>
+    </div>
     {{> inner}}
 </body>
 <script>
@@ -46,6 +50,18 @@
             toast.style.display = 'none';
         }, 3000);
     });
+
+    function copy(text) {
+        navigator.clipboard.writeText(text).catch(function (err) {
+            console.error('Could not copy text: ', err);
+        });
+    }
+
+    function fullscreen(text) {
+        let el = document.getElementById('fullscreen');
+        el.getElementsByClassName("container")[0].textContent = text;
+        el.classList.toggle("shown");
+    }
 </script>
 
 </html>

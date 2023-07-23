@@ -1,8 +1,7 @@
 <div id="container">
     <header>
         <p class="title">{{slug}}@decklist.fun
-            <span class="copy" hx-on:click="copy('{{slug}}@decklist.fun')">📋</span>
-
+            <img src="/img/expand.png" class="expand" hx-on:click="fullscreen('{{slug}}@decklist.fun')" />
         </p>
         {{#name}}<p class="sub">{{.}}</p>{{/name}}
     </header>
@@ -51,12 +50,6 @@
 </div>
 
 <script>
-    function copy(text) {
-        navigator.clipboard.writeText(text).catch(function (err) {
-            console.error('Could not copy text: ', err);
-        });
-    }
-
     function select(elem) {
         htmx.findAll(".inbox-item.selected").forEach(element => {
             element.classList.remove("selected")

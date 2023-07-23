@@ -318,3 +318,37 @@ header .sub {
     cursor: pointer;
     font-size: 0.8em;
 }
+
+.expand {
+    cursor: pointer;
+    width: 1em;
+    height: auto;
+}
+
+#fullscreen {
+    display: none;
+    position: fixed;
+    background: black;
+    color: white;
+    width: 100vw;
+    height: 100vh;
+    align-items: center;
+    justify-content: center;
+}
+
+#fullscreen.shown {
+    display: flex;
+}
+
+#fullscreen .close {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    padding: 5px;
+    font-size: 30px;
+}
+
+#fullscreen .container {
+    transform: rotate(-90deg);
+    font-size: clamp(16px, 9vh, 70px);
+}
