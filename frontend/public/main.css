@@ -185,6 +185,10 @@ header {
     box-shadow: 0 1px 4px black;
 }
 
+header a {
+    text-decoration: none;
+}
+
 header .title {
     font-size: 30px;
     color: var(--off-color);
@@ -351,4 +355,8 @@ header .sub {
 #fullscreen .container {
     transform: rotate(90deg);
     font-size: clamp(16px, 9vh, 70px);
+}
+
+.date {
+    min-height: 1em;
 }

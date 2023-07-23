@@ -1,25 +1,26 @@
 <div id="container">
     <header>
-        <p class="title">{{slug}}@decklist.fun
-            <img src="/img/expand.png" class="expand" hx-on:click="fullscreen('{{slug}}@decklist.fun')" />
-        </p>
-        <p class="sub">
-            From:
-            {{#name}}
-            {{.}}<small> ({{from}})</small>
-            {{/name}}
-            {{^name}}
-            {{from}}
-            {{/name}}
-        </p>
+        <a href="/e/{{slug}}">
+            <p class="title">{{slug}}@decklist.fun
+                <img src="/img/expand.png" class="expand" hx-on:click="fullscreen('{{slug}}@decklist.fun')" />
+            </p>
+            <p class="sub">
+                ev{{slug}}-em{{id}}
+            </p>
+        </a>
     </header>
+
+    <span class="date" hx-ext="date" data-date="{{date}}"></span>
+    <h1>
+        {{#name}}{{.}}<small> ({{from}})</small>{{/name}}
+        {{^name}}{{from}}{{/name}}
+    </h1>
+    <h2>{{subject}}</h2>
+
 
     <form id="updateMail" action="/e/{{slug}}/mail/{{id}}"
         hx-trigger="change from:input[type='checkbox'] delay:500ms, submit" method="post" hx-target="this"
         hx-select="#updateMail" hx-push-url="false">
-        <h1>{{subject}}</h1>
-        <span class="date" hx-ext="date" data-date="{{date}}"></span>
-
         <label for="reviewed">reviewed</label>
         <input type="checkbox" name='reviewed' {{#reviewed}}checked{{/reviewed}}>
         <br />
