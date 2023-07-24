@@ -173,7 +173,6 @@ li {
 #container {
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
 }
 
 header {
@@ -236,6 +235,11 @@ header .sub {
 #inbox a {
     text-decoration: none;
     color: inherit;
+}
+
+.inbox-item-skeleton {
+    border-bottom: 1px solid #ddd;
+    height: 83px;
 }
 
 .inbox-item {

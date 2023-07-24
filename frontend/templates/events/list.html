@@ -38,9 +38,18 @@
         </a>
         {{/mails}}
         {{^mails}}
-        No mails
-        {{#q}}matchig <code>{{.}}</code>.{{/q}}
-        {{^q}}yet. Share <code>{{slug}}@decklist.fun</code> with your players{{/q}}
+        <div class="inbox-item">
+            <div class="selector"></div>
+            <div class="details">
+                <span>
+                    No mails
+                    {{#q}}matchig <code>{{.}}</code>.{{/q}}
+                    {{^q}}yet. Share <code>{{slug}}@decklist.fun</code>
+                    <span class="copy" hx-on:click="copy('{{slug}}@decklist.fun')">📋</span>
+                    with your players{{/q}}
+                </span>
+            </div>
+        </div>
         {{/mails}}
     </div>
 
