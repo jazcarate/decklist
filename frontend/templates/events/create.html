@@ -1,17 +1,53 @@
-<form method="post" action="">
-    <h2>Create a new event</h2>
+<div id="create">
+    <div class="card">
+        <div class="container">
+            <form method="post" action="">
+                <div class="input-group">
+                    <h2>Decklist.fun</h2>
 
-    <label for="name">name</label>
-    <input id="name" name="name" value="{{name}}" />
-    <br />
+                    <div class="stepper-wrapper">
+                        <div class="stepper-item active">
+                            <div class="step-counter">1</div>
+                            <div class="step-name">Create</div>
+                        </div>
+                        <div class="stepper-item">
+                            <div class="step-counter">2</div>
+                            <div class="step-name">Share</div>
+                        </div>
+                        <div class="stepper-item ">
+                            <div class="step-counter">3</div>
+                            <div class="step-name">Use</div>
+                        </div>
+                    </div>
 
-    <label for="slug">slug</label>
-    <input id="slug" name="slug" autocapitalize="none" style="text-transform: lowercase;" value="{{slug}}"
-        {{#validated}}{{#slugExists}}class="error" {{/slugExists}}{{/validated}} />
-    {{#validated}}{{#slugExists}}
-    The slug is taken
-    {{/slugExists}}{{/validated}}
-    <br />
+                    <p>This will generate an email adress you can share with your players, and grant you and your
+                        collegues
+                        access to a shared email inbox to keep track of decklists</p>
+                </div>
 
-    <input type="submit" />
-</form>
+                <div class="input-group">
+                    <label for="slug">Slug<br />
+                        <small>Username of your new email adress: <code>[Slug]@decklist.fun</code></small></label>
+                    <input id="slug" name="slug" autocapitalize="none" style="text-transform: lowercase;"
+                        value="{{slug}}" {{#validated}}class="error" {{/validated}} />
+                    <p class="error">{{#validated}}
+                        {{#slugExists}}
+                        The Slug is taken
+                        {{/slugExists}}
+                        {{^slugExists}}
+                        You need to specify a Slug
+                        {{/slugExists}}
+                        {{/validated}}
+                    </p>
+                </div>
+
+                <div class="input-group">
+                    <label for="name">Name of your event <i>(optional)</i></label><br />
+                    <input id="name" name="name" value="{{name}}" />
+                </div>
+
+                <input type="submit" value="Create" class="next-step" />
+            </form>
+        </div>
+    </div>
+</div>

@@ -24,6 +24,10 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, data, request, wa
         return renderFull(createEvent, { ...view, validated: true });
 
     slug = slug.toLowerCase();
+    const emailSuffix = "@decklist.fun";
+    if (slug.endsWith(emailSuffix)) {
+        slug = slug.substring(0, emailSuffix.length);
+    }
 
     const existingEvent = await env.db.get(`events:${slug}`);
     if (existingEvent != null) {
