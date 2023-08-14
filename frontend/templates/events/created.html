@@ -21,14 +21,19 @@
                     </div>
                 </div>
 
-                <p>You can now share <code>{{slug}}@decklist.fun</code> with your players.</p>
                 <p>
-                    Share with your collegues, and with your devices the secret: <code>{{secret}}</code>
-                    Or directly share this link: <a href="{{manageLink}}">{{manageLink}}</a>.
+                    You can now share <code>{{slug}}@decklist.fun</code>
+                    <span class="copy" hx-on:click="copy('{{slug}}@decklist.fun')">📋</span> with your players.
+                </p>
+                <p>
+                    Share with your collegues, this link: <a href="{{manageLink}}">{{manageLink}}</a><span class="copy"
+                        hx-on:click="copy('{{manageLink}}')">📋</span>.
                 </p>
             </div>
 
-            <a href="{{manageLink}}" clas="next-step">Go to the inbox</a>
+            <div class="cta">
+                <a href="{{manageLink}}" class="next-step">Go to the inbox</a>
+            </div>
         </div>
     </div>
 </div>

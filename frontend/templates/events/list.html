@@ -54,8 +54,9 @@
     </div>
 
     <div class="share">
-        Share this code to your fellow judges <code>{{secret}}</code><span class="copy"
-            hx-on:click="copy(window.location.origin + '/e/{{slug}}/login?p={{secret}}')">📋</span>.
+        Share this <a href="/e/{{slug}}/login?p={{secret}}">link</a><span class="copy"
+            hx-on:click="copy(window.location.origin + '/e/{{slug}}/login?p={{secret}}')">📋</span> to your fellow
+        judges to access this inbox.
     </div>
 </div>
 

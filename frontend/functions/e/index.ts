@@ -29,6 +29,10 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, data, request, wa
         slug = slug.substring(0, emailSuffix.length);
     }
 
+    if (!/^[a-z0-9.]+$/.test(slug)) {
+        return renderFull(createEvent, { ...view, slugFormat: true, validated: true });
+    }
+
     const existingEvent = await env.db.get(`events:${slug}`);
     if (existingEvent != null) {
         return renderFull(createEvent, { ...view, slugExists: true, validated: true });

@@ -241,12 +241,7 @@ header .sub {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    text-align: center;
-
-    background-size: 200px;
-    background-repeat: repeat;
-    animation: scrollBackground 20s linear infinite;
-    padding: 20px;
+    min-height: 100vh;
 }
 
 #create .next-step {
@@ -259,6 +254,7 @@ header .sub {
     padding: 10px 40px;
     text-decoration: none;
     border: none;
+    display: inline-block;
 }
 
 .input-group {
@@ -283,6 +279,10 @@ header .sub {
 
 .card .container {
     padding: 2px 16px;
+}
+
+.card .cta {
+    text-align: center;
 }
 
 .stepper-wrapper {
@@ -466,6 +466,11 @@ header .sub {
     color: white;
     padding: 20px;
     text-align: center;
+}
+
+.share a {
+    color: var(--main-color);
+    pointer-events: none;
 }
 
 .copy {
